@@ -5,23 +5,25 @@ description: "Pinned versions for every dependency that ships with Vexel Mobile 
 
 Vexel Mobile is built on a pinned set of Flutter packages. Keep these versions in sync with `pubspec.yaml` when upgrading.
 
-| Category | Technology | Version | Description |
+| Category | Package | Version | Description |
 | :--- | :--- | :--- | :--- |
 | Mobile framework | Flutter | Dart SDK `^3.7.2` | Google's cross-platform UI toolkit |
-| State management | Riverpod | `2.6.1` | Reactive, immutable state framework |
-| Charts and visuals | Syncfusion Charts | `31.1.19` | High-performance charting for financial data |
-| HTTP client | http | `1.6.0` | REST client for `Vexel-Core` |
-| WebSocket client | socket_io_client | `3.1.4` | Real-time communication with `Vexel-Core` |
-| Secure storage | flutter_secure_storage | `10.0.0` | Stores JWTs and preferences in the device keystore |
-| Biometric auth | local_auth | `2.3.0` | FaceID, TouchID, and fingerprint prompts |
-| Speech recognition | speech_to_text | `7.0.0` | Backs the `VoiceCommandWidget` |
-| QR scanning | mobile_scanner | `6.0.4` | Sovereign Link QR reader |
-| NFC | nfc_manager | `3.3.0` | Read/write NFC for RWA tethering |
-| Internationalization | intl | `0.20.2` | Locale-aware date and number formatting |
-| Fonts | google_fonts | `6.3.2` | Bundles the `Inter` font family |
-| Icons | cupertino_icons | `1.0.8` | iOS-style icon set |
-| Dev tooling | flutter_lints | `5.0.0` | Recommended lint rules |
-| Launcher icons | flutter_launcher_icons | `0.13.1` | Generates platform launcher icons |
+| State management | `flutter_riverpod` | `2.6.1` | Reactive, immutable state framework used across the app |
+| Charts and visuals | `syncfusion_flutter_charts` | `^31.1.19` | High-performance charting for financial data |
+| HTTP client | `http` | `^1.6.0` | REST client for `Vexel-Core` |
+| WebSocket client | `socket_io_client` | `^3.1.4` | Real-time communication with `Vexel-Core` |
+| Low-level sockets | `web_socket_channel` | `^3.0.3` | Stream-based WebSocket primitives used by the service layer |
+| External links | `url_launcher` | `^6.3.1` | Opens news URLs from `AssetDetailScreen` |
+| Secure storage | `flutter_secure_storage` | `^10.0.0` | Stores JWTs and preferences in the device keystore |
+| Biometric auth | `local_auth` | `^2.3.0` | FaceID, TouchID, and fingerprint prompts |
+| Speech recognition | `speech_to_text` | `^7.0.0` | Backs the `VoiceCommandWidget` |
+| QR scanning | `mobile_scanner` | `^6.0.4` | Sovereign Link QR reader |
+| NFC | `nfc_manager` | `^3.3.0` | Read/write NFC for RWA tethering |
+| Internationalization | `intl` | `^0.20.2` | Locale-aware date and number formatting |
+| Fonts | `google_fonts` | `^6.3.2` | Bundles the `Inter` font family |
+| Icons | `cupertino_icons` | `^1.0.8` | iOS-style icon set |
+| Dev tooling | `flutter_lints` | `^5.0.0` | Recommended lint rules |
+| Launcher icons | `flutter_launcher_icons` | `^0.13.1` | Generates platform launcher icons |
 
 ## Updating dependencies
 
