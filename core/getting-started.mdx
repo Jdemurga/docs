@@ -1,0 +1,119 @@
+---
+title: "Getting started with Vexel Core"
+description: "Set up prerequisites, configure environment variables, and run Vexel Core locally or in production."
+---
+
+Vexel Core is a NestJS service. To run it locally you need Node.js, PostgreSQL, and Redis. Optionally, a running Vexel Brain instance enables the AI-powered endpoints.
+
+## Prerequisites
+
+- **Node.js** 18 or later
+- **npm** for dependency management
+- **PostgreSQL** with the TimescaleDB extension for price history
+- **Redis** for the microservice mesh and Socket.io adapter
+- **Vexel Brain** (optional) for AI forecasts, risk scans, and voice commands
+
+## Environment variables
+
+Create a `.env` file in the Vexel Core repository root. Replace every placeholder before deploying.
+
+```ini
+# PostgreSQL
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=vexel_user
+DB_PASSWORD=vexel_pass
+DB_NAME=vexel_db
+
+# JWT
+JWT_SECRET=change_me_in_production
+
+# Market data providers
+FINNHUB_API_KEY=your_finnhub_key
+COINGECKO_API_KEY=your_coingecko_key
+ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key
+TWELVE_DATA_API_KEY=your_twelve_data_key
+
+# Vexel Brain
+BRAIN_URL=http://localhost:8000
+
+# Inter-service security
+SHARED_SECRET=your_shared_secret
+PQ_MASTER_SECRET=your_quantum_master_seed
+VAULT_MASTER_KEY=your_32_char_vault_key
+
+# Trading
+TRADING_MODE=paper
+ALPACA_API_KEY=your_alpaca_paper_key
+ALPACA_LIVE_KEY=your_alpaca_live_key
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Application
+PORT=3000
+```
+
+<Warning>
+  Never commit production secrets. In production, set `TypeORM.synchronize` to `false` and apply migrations through your release pipeline. Leaving synchronize enabled can silently drop columns.
+</Warning>
+
+## Install dependencies
+
+```bash
+npm install
+```
+
+## Run locally
+
+<Tabs>
+  <Tab title="Development">
+    ```bash
+    npm run start:dev
+    ```
+    Runs the server with hot reload, reacting to file changes.
+  </Tab>
+  <Tab title="Debug">
+    ```bash
+    npm run start:debug
+    ```
+    Starts the server with the Node inspector enabled so you can attach a debugger (for example VS Code).
+  </Tab>
+  <Tab title="Production">
+    ```bash
+    npm run start:prod
+    ```
+    Compiles TypeScript to `dist/` and runs the compiled output. Recommended for staging and production deployments.
+  </Tab>
+</Tabs>
+
+## Run tests
+
+```bash
+# Unit tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Coverage report
+npm run test:cov
+
+# End-to-end
+npm run test:e2e
+```
+
+## Verify the service
+
+Once the server is running, hit the health endpoint:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+A healthy response confirms the service booted and can accept requests. From there you can proceed to the [Authentication API](/core/api/authentication) to register a user and obtain a JWT.
+
+<Tip>
+  For a fully-featured local environment, bring up PostgreSQL (with TimescaleDB), Redis, and Vexel Brain alongside Core using Docker Compose. Core's `Dockerfile` and `Dockerfile.prod` are included in the repository for containerized deployments.
+</Tip>

@@ -1,0 +1,148 @@
+---
+title: "Market API"
+description: "Quotes, analysis, watchlists, portfolios, trading, reports, and public ecosystem endpoints exposed by the Vexel Core Market module."
+---
+
+The Market module is the largest surface in Vexel Core. It aggregates quotes and fundamentals from multiple providers, drives watchlists and narrative portfolios, routes trades, generates reports, and exposes public ecosystem metrics for Guest Mode in Horizon.
+
+## Base path
+
+All endpoints are rooted at `/market`. Marketplace and webhook routes use `/marketplace` and `/webhooks` respectively.
+
+## Public market data
+
+These endpoints do not require authentication. They back Horizon's Guest Mode and ecosystem widgets.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/search` | Search assets (stocks and crypto) by query |
+| `GET` | `/market/price` | Current price for an asset |
+| `GET` | `/market/analysis` | Full analysis bundle (quote, forecast, news) |
+| `GET` | `/market/history` | Historical price series |
+| `GET` | `/market/news` | News related to an asset |
+| `GET` | `/market/fundamentals` | Fundamentals (P/E, market cap, and more) |
+| `GET` | `/market/community-sentiment` | Popularity-based sentiment |
+| `GET` | `/market/trending` | Trending assets across providers |
+| `GET` | `/market/on-chain` | On-chain sentiment for crypto (via Brain) |
+| `GET` | `/market/simulate` | Simulate an asset under a scenario |
+| `POST` | `/market/simulate/interpret` | Interpret a free-form scenario (via Brain) |
+| `GET` | `/market/public/dashboard` | Public dashboard snapshot |
+| `GET` | `/market/public/ecosystem` | Global ecosystem statistics |
+| `GET` | `/market/public/index-history` | Simulated Vexel index history |
+| `GET` | `/market/public/yield/status` | Ecosystem-wide yield status |
+| `GET` | `/market/public/rwa` | Public RWA opportunities |
+| `GET` | `/market/public/proposals` | Public governance proposals |
+| `GET` | `/market/verify-model` | Brain model availability |
+| `GET` | `/market/defense/status` | Quantum defense status (via Brain) |
+| `GET` | `/market/cluster/status` | Brain cluster health |
+| `GET` | `/market/consensus/status` | Distributed consensus status |
+| `GET` | `/market/bridge/status` | Cross-chain bridge status |
+| `GET` | `/market/ledger/integrity` | Verify immutable ledger hash chain |
+| `GET` | `/market/security/quantum-check` | Generate a hybrid PQC signature sample |
+
+## Authenticated endpoints
+
+The following endpoints require a bearer JWT.
+
+### Dashboards and preferences
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/dashboard` | Personalized dashboard for the authenticated user |
+| `GET` | `/market/correlations` | Portfolio correlation matrix |
+| `GET` | `/market/risk-scan` | Risk scan across holdings (via Brain) |
+| `GET` | `/market/stress-test` | Stress test against the current portfolio (via Brain) |
+
+### Watchlists
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/watchlist` | Read the user's watchlist |
+| `POST` | `/market/watchlist` | Add an asset to the watchlist |
+| `DELETE` | `/market/watchlist` | Remove an asset from the watchlist |
+
+### Narrative portfolios
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/portfolios` | List the user's narrative portfolios |
+| `POST` | `/market/portfolios` | Create or update a narrative portfolio |
+| `POST` | `/market/strategy/canvas` | Save a Neural Canvas strategy and simulate (via Brain) |
+
+### Trading and execution
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/trading/balance` | Trading account balance |
+| `POST` | `/market/trading/order` | Place a buy or sell order |
+| `GET` | `/market/trading/history` | Trading history |
+| `POST` | `/market/execute` | Initiate a sensitive operation (see approval flow) |
+| `POST` | `/market/authorize` | Authorize a pending operation with a Mobile signature |
+| `POST` | `/market/voice/command` | Process a voice command (via Brain) |
+| `POST` | `/market/autonomous/rebalance` | Start an autonomous rebalance |
+
+<Warning>
+  Operations initiated via `/market/execute`, `/market/voice/command`, and `/market/autonomous/rebalance` do **not** commit immediately. They are parked and require `/market/authorize` with a valid Mobile signature. See [Real-time events](/core/api/realtime) for the approval flow.
+</Warning>
+
+### Reports, taxes, and insurance
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/report` | Latest user report |
+| `GET` | `/market/report/download` | Download the weekly report |
+| `GET` | `/market/taxes` | Estimate capital gains and tax load |
+| `GET` | `/market/insurance/quote` | Quote sovereign insurance premium |
+| `POST` | `/market/insurance/activate` | Activate sovereign insurance for a portfolio |
+
+### Yield, RWA, and orchestration
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/yield/scan` | Scan omnichain yield opportunities |
+| `POST` | `/market/yield/optimize` | Run the yield optimizer |
+| `GET` | `/market/yield/personal` | Personal real-time yield status |
+| `GET` | `/market/rwa/scan` | Scan real-world asset opportunities |
+| `POST` | `/market/rwa/invest` | Simulate an RWA investment |
+| `POST` | `/market/orchestrate` | Run the portfolio orchestrator (via Brain) |
+| `POST` | `/market/analyze-docs` | Extract insights from a document (via Brain) |
+| `GET` | `/market/discovery` | AI-discovered asset suggestions (via Brain) |
+| `POST` | `/market/optimize-ai` | Optimize Brain results |
+| `POST` | `/market/sync-history` | Force a watchlist history sync |
+
+## Marketplace and webhooks
+
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/marketplace/portfolios` | Public | Public narrative portfolios with trust scores |
+| `GET` | `/marketplace/global-alpha` | Public | Global narrative alpha score |
+| `POST` | `/webhooks/signals` | Webhook key | External trading signals (verified with Ed25519) |
+
+## Response shape
+
+Most endpoints return JSON with the following envelope:
+
+```json
+{
+  "status": "ok",
+  "data": { }
+}
+```
+
+Error responses use NestJS defaults:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized",
+  "error": "Unauthorized"
+}
+```
+
+## Data providers
+
+Vexel Core composes data from Finnhub, CoinGecko, Alpha Vantage, and Twelve Data. Provider failures are tolerated through fallback logic — a missing fundamentals provider, for example, does not break a dashboard response.
+
+<Info>
+  History endpoints read from and write to TimescaleDB. The first call for a new asset may trigger a background sync handled by `HistorySyncService`.
+</Info>
