@@ -26,15 +26,17 @@ Vexel Core is the central backend service of the Vexel ecosystem. It is a NestJS
 
 Vexel Core is built on TypeScript and Node.js, using the NestJS framework for modular, scalable architecture.
 
-| Layer | Technology |
-|---|---|
-| Framework | NestJS 11 (Express adapter) |
-| Database | PostgreSQL with TypeORM, TimescaleDB for time-series history |
-| Real-time | Socket.io via `@nestjs/websockets` |
-| Cache and mesh | Redis with `ioredis` |
-| Authentication | JWT via `@nestjs/jwt` and `passport-jwt`, bcrypt for password hashing |
-| Scheduling | `@nestjs/schedule` for cron jobs |
-| AI bridge | HTTP RPC to Vexel Brain with signed payloads |
+| Layer | Technology | Version |
+|---|---|---|
+| Framework | NestJS (Express adapter) | `11.1.18` |
+| Language and runtime | TypeScript on Node.js | `5.9.3` / Node `20` |
+| Database | PostgreSQL with TypeORM, TimescaleDB for time-series history | `typeorm@0.3.28`, `pg@8.20.0` |
+| Real-time | Socket.io via `@nestjs/websockets` | `@nestjs/platform-socket.io@11.1.18` |
+| Cache and mesh | Redis with `ioredis` | `5.10.1` |
+| Authentication | JWT via `@nestjs/jwt` and `passport-jwt`, bcrypt for password hashing | `@nestjs/jwt@11.0.2`, `bcrypt@6.0.0` |
+| Scheduling | `@nestjs/schedule` for cron jobs | `6.1.1` |
+| HTTP client | Axios with `@nestjs/axios` | `axios@1.15.0` |
+| AI bridge | HTTP RPC to Vexel Brain with signed payloads | Signed by `SecurityService` |
 
 ## Ecosystem position
 
