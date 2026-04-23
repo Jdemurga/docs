@@ -144,7 +144,24 @@
                 "group": "App Surfaces",
                 "pages": [
                   "mobile/dashboard",
-                  "mobile/action-approval"
+                  "mobile/action-approval",
+                  "mobile/screens/auth",
+                  "mobile/screens/asset-detail",
+                  "mobile/screens/portfolio-detail",
+                  "mobile/screens/create-portfolio",
+                  "mobile/screens/watchlist",
+                  "mobile/screens/search",
+                  "mobile/screens/simulation-lab",
+                  "mobile/screens/reasoning-feed",
+                  "mobile/screens/profile",
+                  "mobile/screens/guide"
+                ]
+              },
+              {
+                "group": "Features",
+                "pages": [
+                  "mobile/features/voice-commands",
+                  "mobile/features/nfc-tethering"
                 ]
               },
               {
@@ -152,6 +169,7 @@
                 "pages": [
                   "mobile/architecture",
                   "mobile/tech-stack",
+                  "mobile/services",
                   "mobile/api",
                   "mobile/security"
                 ]

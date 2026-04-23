@@ -1,0 +1,32 @@
+---
+title: "Simulation Lab"
+description: "Run what-if simulations on any asset — tweak trend, sentiment, and volume, or describe a scenario in natural language."
+---
+
+`SimulationLabScreen` is reached by tapping the forecast card on [Asset detail](/mobile/screens/asset-detail). It hands the user three sliders and a natural-language command box, and renders the AI's projected outcome.
+
+## Controls
+
+| Control | Range | Parameter |
+| :--- | :--- | :--- |
+| Trend | `-1.0` to `1.0` | `trendPct` |
+| Sentiment | `0.0` to `1.0` | `sentiment` |
+| Volume | `-1.0` to `1.0` | `volume` |
+| Natural-language command | text | Fed to `/market/simulate/interpret` |
+
+## Natural-language interpretation
+
+Typing a scenario (for example, *"buy if sentiment is high and volume spikes"*) and submitting triggers `MarketService.interpretScenario`, which posts to `POST /market/simulate/interpret`. The response contains the three slider values along with a human-readable `interpretation` string that is surfaced in a `SnackBar`. The sliders move automatically so you can tweak from the interpreted baseline.
+
+## Running the simulation
+
+`_runSimulation` calls `MarketService.getSimulation` with the asset symbol, the three slider values, and the active `languageCode`. Under the hood this is a `GET /market/simulate?symbol=...&trendPct=...&sentiment=...&volume=...&lang=...`. The result is stored in `_result` and rendered as a chart plus commentary block.
+
+## Provider dependencies
+
+- `marketServiceProvider` — imperative calls to the simulation endpoints.
+- `localeProvider` — passes `languageCode` so the AI output is localized.
+
+<Note>
+  Simulation Lab is read-only. Running a scenario never creates a `pending_action`; to act on the insight the user must open [Asset detail](/mobile/screens/asset-detail) and tap **Buy** or **Sell**.
+</Note>

@@ -1,0 +1,75 @@
+---
+title: "Services"
+description: "Vexel Mobile's service layer — the ViewModel/Repository boundary that brokers every REST call, WebSocket event, and platform capability."
+---
+
+Services live in `lib/services/` and encapsulate everything that is not pure UI. Each service is exposed through a Riverpod provider so screens can stay declarative.
+
+## Service map
+
+| Service | File | Responsibilities |
+| :--- | :--- | :--- |
+| `AuthService` | `auth_service.dart` | Login, registration, JWT storage, Sovereign Link, action authorization |
+| `MarketService` | `market_service.dart` | REST and WebSocket client for market data, watchlist, portfolios, simulations, reasoning logs |
+| `BiometricController` | `biometric_controller.dart` | Wraps `local_auth` for FaceID, TouchID, and fingerprint prompts |
+| `LocalizationService` | `localization_service.dart` | Loads translation JSON, exposes `LocaleNotifier` and `ref.tr(...)` |
+| `ThemeService` | `theme_service.dart` | Persists `VexelTheme` preference, exposes `themeProvider` |
+| `UserService` | `user_service.dart` | Pushes user preferences (language, etc.) to `Vexel-Core` |
+| `NfcTetheringService` | `nfc_tethering_service.dart` | NFC read/write bridge for RWA tethering |
+
+## `AuthService`
+
+Handles authentication and the biometric authorization pipeline.
+
+- **`login(email, pass)`** — posts `POST /auth/login`, stores the JWT in `flutter_secure_storage`, hydrates `authStateProvider`.
+- **`signUp(email, pass, name)`** — posts `POST /auth/signup` with the same downstream behavior.
+- **`logout()`** — clears the stored JWT and resets `authStateProvider`.
+- **`linkSession(sessionId)`** — posts `POST /auth/link` with the JWT and the scanned `sessionId` (see [Sovereign Link](/mobile/sovereign-link)).
+- **`authorizeAction(txnId, signature, pqcSignature)`** — posts `POST /auth/authorize` with both the standard and simulated PQC signatures.
+
+## `MarketService`
+
+The largest service. It owns the Socket.io connection and every market-data REST call. All providers below fan out from here:
+
+- `watchlistProvider` → `GET /market/watchlist`
+- `portfoliosProvider` → `GET /market/portfolios`
+- `trendingAssetsProvider` → `GET /market/trending`
+- `reasoningLogsProvider` → `GET /market/trading/history`
+- `assetHistoryProvider(symbol, type)` → `GET /market/history`
+- `searchResultsProvider(query)` → `GET /market/search`
+- `priceUpdateProvider` (`StreamProvider`) → `priceUpdate` events from Socket.io
+- `livePriceProvider` (`StateNotifierProvider`, driven by `PriceRegistry`) → last price per symbol
+
+Write helpers invalidate the relevant providers so the UI refreshes without manual refetches:
+
+```dart
+await ref.read(marketServiceProvider).savePortfolio(name, assets);
+ref.invalidate(portfoliosProvider);
+```
+
+## `BiometricController`
+
+Thin wrapper over `local_auth`:
+
+- **`authenticate()`** — presents the OS biometric prompt. Returns a Boolean.
+- **`signAction(txnId)`** — returns a standard device signature plus the simulated Lattice-based PQC signature (`pqc_shield_...LATTICE_SALT_SIM`).
+
+See [Security posture](/mobile/security) for the broader context.
+
+## `LocalizationService` and `LocaleNotifier`
+
+- `LocalizationService.load(languageCode)` — loads `assets/lang/{languageCode}.json` and caches the map in memory.
+- `LocaleNotifier` — `StateNotifier` that reads the preferred language from `flutter_secure_storage`, falls back to the OS locale, and syncs changes to `Vexel-Core` through `UserService`.
+- `LocaleContext` extension — adds `ref.tr('key')` and `ref.tr('key_with_args').replaceAll('{0}', value)` to any `WidgetRef`.
+
+## `ThemeService`
+
+`StateNotifier<VexelTheme>` that stores the active theme in `flutter_secure_storage`. The `themeProvider` exposes the current value and `VexelApp` renders either `_buildSlateBlackTheme` or `_buildPremiumWhiteTheme`.
+
+## `UserService`
+
+Very small — posts to `POST /auth/preferences` with the JWT. Today it is used exclusively to sync the user's preferred language, but it is the extension point for every future account-level preference.
+
+## `NfcTetheringService`
+
+Wraps `nfc_manager` for RWA tethering. See [NFC tethering](/mobile/features/nfc-tethering) for the product context.

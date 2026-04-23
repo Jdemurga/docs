@@ -1,0 +1,27 @@
+---
+title: "Login and registration"
+description: "LoginScreen and RegisterScreen are the two entry points into the Vexel ecosystem — they exchange credentials for a JWT that powers the rest of the app."
+---
+
+`AuthWrapper` (declared in `lib/main.dart`) decides which surface to render based on `authStateProvider`. Unauthenticated users see `LoginScreen`; tapping **Create an account** routes to `RegisterScreen`.
+
+## Login
+
+`LoginScreen` collects an email and password, then calls `AuthService.login(email, pass)`. The service posts to `POST /auth/login` and returns a JWT plus the user document. Both are stored:
+
+- JWT in `flutter_secure_storage` (platform keystore).
+- User map in the `authStateProvider` state.
+
+On success the wrapper transitions to `DashboardScreen`.
+
+## Registration
+
+`RegisterScreen` collects a name, email, and password, then calls `AuthService.signUp(email, pass, name)` which posts to `POST /auth/signup`. The backend creates the account and returns a JWT, after which the flow mirrors login.
+
+## Failure handling
+
+Both screens handle HTTP 4xx responses by surfacing a `SnackBar` with the localized error. 5xx errors fall back to a generic retry message. The JWT is never written to storage unless the backend returns a valid token, so a failed attempt leaves the app unchanged.
+
+<Note>
+  Vexel Mobile is the only component that can create an authenticated session. Vexel Horizon bootstraps into **Guest Mode** and only unlocks personal data after the user scans a Sovereign Link QR with a logged-in phone.
+</Note>
