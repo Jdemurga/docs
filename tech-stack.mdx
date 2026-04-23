@@ -1,0 +1,57 @@
+---
+title: "Tech stack"
+description: "The libraries, browser APIs, and tooling that power the Vexel Horizon web terminal."
+---
+
+Vexel Horizon is deliberately framework-free. The terminal is built on modern web standards so it stays light, transparent, and fast even on high-density Sovereign dashboards.
+
+## Runtime
+
+| Category | Component | Notes |
+|---|---|---|
+| Core frontend | Vanilla JavaScript (ES6+) | No UI framework. Modules are plain files loaded from `index.html`. |
+| Markup | HTML5 | Semantic skeleton with sidebar navigation and dynamically toggled sections. |
+| Styling | Vanilla CSS ("Sovereign UI") | Custom design system with CSS variables, glassmorphism, dark theme by default. |
+| Charts | [Chart.js](https://www.chartjs.org/) v3+ | Powers `marketChart` (performance line) and `allocationChart` (portfolio doughnut). |
+| Real time | [`socket.io-client`](https://socket.io/docs/v4/client-installation/) | Single WebSocket to Vexel Core; handles `sessionLinked`, `marketPulse`, `action_completed`, and `session_revoked`. |
+| Voice | [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) (`webkitSpeechRecognition`) | Drives the `SovereignVoice` engine. Best support on Chromium-based browsers. |
+| Internationalization | JSON catalogs (`lang/en.json`, `lang/es.json`) | Loaded by `localization.js` and applied to every element with a `data-i18n` attribute. |
+| QR generation | [QRServer API](https://goqr.me/api/) | External service used to render Sovereign Link QR codes. |
+
+## Tooling
+
+| Tool | Purpose |
+|---|---|
+| `npx serve` | Recommended local static server for development. |
+| Nginx | Production reverse proxy that serves the static bundle and forwards `/api`, `/brain`, and the Socket.io upgrade to Vexel Core and Brain. |
+| `deepdocs.yml` (DeepDocs) | Drives automated documentation generation from the source tree. It is tooling only — not part of the runtime. |
+
+## File layout
+
+```
+vexel-horizon/
+├── index.html          # Semantic skeleton, modals, sidebar, main content
+├── styles.css          # Sovereign UI design system
+├── app.js              # Orchestrator: routing, sockets, Chart.js, REST calls
+├── canvas.js           # Neural Strategist engine (NeuralNode, StrategyCanvas)
+├── localization.js     # i18n loader + DOM hydration
+├── nginx.conf          # Reference reverse proxy configuration
+├── deepdocs.yml        # Docs automation config
+├── lang/
+│   ├── en.json         # English translations
+│   └── es.json         # Spanish translations
+└── vexel_horizon_architecture.md
+```
+
+## Browser support
+
+- **Chromium-based browsers (Chrome, Edge, Brave, Arc)** — full support, including voice commands.
+- **Safari and Firefox** — core dashboard, charts, and Sovereign Link work. The Web Speech API is partial or disabled, so the voice engine degrades gracefully.
+
+## External dependencies
+
+Vexel Horizon has no bundler and no `package.json` runtime dependencies. Third-party libraries load as browser scripts (Chart.js, `socket.io-client`) and the only external network call that does not target Vexel Core is the QRServer endpoint used to render Sovereign Link QR codes.
+
+<Info>
+  Because the terminal is framework-free, you can fork the static bundle, drop in any Vexel Core instance as the proxied origin, and host it behind Nginx, Cloudflare Pages, or any CDN that serves static assets.
+</Info>

@@ -31,6 +31,13 @@
                 ]
               },
               {
+                "group": "Reference",
+                "pages": [
+                  "architecture",
+                  "tech-stack"
+                ]
+              },
+              {
                 "group": "API Reference",
                 "pages": [
                   "api-reference/websocket-events"
