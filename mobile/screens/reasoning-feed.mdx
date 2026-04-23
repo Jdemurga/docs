@@ -1,0 +1,21 @@
+---
+title: "Reasoning feed"
+description: "ReasoningFeedScreen is the sovereign audit log — every AI decision surfaced on Vexel Mobile is recorded and reviewable here."
+---
+
+`ReasoningFeedScreen` renders the **Sovereign Audit** log, giving the user a chronological stream of every AI reasoning event attached to their account.
+
+## Data source
+
+The screen watches `reasoningLogsProvider`, a `FutureProvider` backed by `MarketService.getReasoningLogs()` (`GET /market/trading/history`). The backend returns a list of entries, each describing a decision, the inputs that produced it, and the confidence score.
+
+## States
+
+- **Loading** — circular progress indicator.
+- **Empty** — renders the localized `no_intelligence` and `no_intelligence_desc` strings with the `history_edu_outlined` icon.
+- **Data** — scrollable list of reasoning entries. Each item shows the symbol or portfolio context, the action type, the timestamp, and an expandable rationale string.
+- **Error** — inline error with a retry affordance.
+
+<Note>
+  The reasoning feed is the mobile counterpart to the **Sovereign Audit** surface on Vexel Horizon. The same `/market/trading/history` endpoint powers both, so the ledger is always in sync.
+</Note>

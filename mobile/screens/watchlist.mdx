@@ -1,0 +1,20 @@
+---
+title: "Watchlist"
+description: "WatchlistScreen is the dedicated view for assets you are tracking, with live Mesh price updates for every row."
+---
+
+`WatchlistScreen` is reached from the bottom navigation (index `1`). It renders every asset the user has saved, backed by `watchlistProvider` (a `FutureProvider` that resolves `GET /market/watchlist`).
+
+## How it works
+
+- Each row is an `AssetCard`, identical to the one on the dashboard.
+- Prices stream in through `livePriceProvider`, so the cards recompute on every `priceUpdate` tick received over Socket.io.
+- Tapping a row opens [Asset detail](/mobile/screens/asset-detail). Swiping left offers a **Remove** action that fires `MarketService.removeFromWatchlist(symbol)` against `DELETE /market/watchlist?symbol={symbol}`.
+
+## Adding to the watchlist
+
+Watchlist membership is toggled from the [Asset detail](/mobile/screens/asset-detail) screen's `AppBar` action, which calls `MarketService.addToWatchlist(asset)` (POST) or `removeFromWatchlist(symbol)` (DELETE). Both mutations invalidate `watchlistProvider`, so this screen and the dashboard both refresh immediately.
+
+<Note>
+  The watchlist is a server-owned resource. It syncs across every device signed into the same account because Vexel Mobile never treats local state as canonical.
+</Note>

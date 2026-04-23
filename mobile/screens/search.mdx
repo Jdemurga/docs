@@ -1,0 +1,28 @@
+---
+title: "Search"
+description: "SearchScreen queries the Vexel Core asset catalog in real time and routes results to the asset detail surface."
+---
+
+`SearchScreen` is opened from the dashboard `AppBar` search icon. It is a `ConsumerStatefulWidget` with a single `TextField` wired to `searchResultsProvider(query)`.
+
+## Behavior
+
+- Every keystroke updates the local `_query` string, which is the parameter to `searchResultsProvider`.
+- `searchResultsProvider` is a `FutureProvider.family` that issues `GET /market/search?q={query}` against `Vexel-Core`.
+- Results are rendered as a list of rows (symbol, description, asset type). Tapping a row opens [Asset detail](/mobile/screens/asset-detail).
+- The results automatically debounce through Riverpod's provider cache — identical queries return the previously fetched list instead of re-hitting the backend.
+
+## Empty, loading, and error states
+
+The `.when` branch on `searchResultsProvider` renders three distinct states:
+
+| State | UI |
+| :--- | :--- |
+| `loading` | Circular progress indicator |
+| `error` | Inline error with retry |
+| `data` (empty list) | Empty placeholder with the localized `search_empty` string |
+| `data` (non-empty) | Scrollable list of tappable rows |
+
+<Note>
+  Search powers both the standalone screen and `AssetPickerSheet` inside [Create portfolio](/mobile/screens/create-portfolio). Both surfaces consume the same provider so caches are shared.
+</Note>

@@ -1,0 +1,32 @@
+---
+title: "Profile"
+description: "ProfileScreen manages the signed-in user — account details, theme, language, Sovereign Link sessions, and logout."
+---
+
+`ProfileScreen` is the fourth tab of the dashboard bottom navigation. It reads from multiple providers to present a single place where the user controls their account, preferences, and paired web sessions.
+
+## Providers consumed
+
+| Provider | Role |
+| :--- | :--- |
+| `authStateProvider` | User email and display name |
+| `localeProvider` | Active language, with a selector that persists to backend |
+| `themeProvider` | Active theme (`slateBlack` or `premiumWhite`) |
+| `marketServiceProvider` | Emits `session_revoked` over Socket.io when a web session is revoked |
+
+## Sections
+
+- **Identity** — avatar, display name, email, membership badge.
+- **Portfolio summary** — at-a-glance `portfolio_value` stat.
+- **Preferences** — language selector (syncs via `UserService.updatePreferences`), theme toggle (persisted in `flutter_secure_storage` by `ThemeService`).
+- **Sovereign Link** — shortcut to [SovereignScannerScreen](/mobile/sovereign-link), plus the list of paired web sessions with a **Revoke** button on each.
+- **Guide** — entry point to [Guide](/mobile/screens/guide).
+- **Logout** — clears the JWT from `flutter_secure_storage` via `AuthService.logout()`, which transitions `authStateProvider` back to the unauthenticated state and routes to `LoginScreen`.
+
+## Revoking a web session
+
+Tapping **Revoke** on a paired web session emits `session_revoked` over the WebSocket carrying the `sessionId` of the browser to disconnect. `Vexel-Core` relays the event to the matching Horizon session, which falls back into Guest Mode and re-applies the frosted blur.
+
+<Note>
+  Language and theme preferences are persisted locally in `flutter_secure_storage`, but language also syncs to the server (`POST /auth/preferences`) so other Vexel surfaces match the user's choice.
+</Note>

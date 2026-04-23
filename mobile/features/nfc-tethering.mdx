@@ -1,0 +1,19 @@
+---
+title: "NFC tethering"
+description: "NfcTetheringService is the bridge between Vexel Mobile and real-world assets — NFC reads and writes anchor RWAs to a user's sovereign identity."
+---
+
+`NfcTetheringService` wraps `nfc_manager` to read from and write to NFC tags. It is the foundation of **RWA tethering** — the process of binding a physical object (a collector item, a document, a device) to a user's Vexel identity.
+
+## Capabilities
+
+- **Read** — decode an NFC tag and surface the embedded payload to the caller. Typical payloads include a tag UID and a signed reference to a Vexel asset.
+- **Write** — provision a tag with a payload that the backend has pre-computed and signed, so subsequent reads prove the tether.
+
+## Security model
+
+NFC payloads are never interpreted as commands. They are treated as references: the mobile app reads a tag and forwards the payload to `Vexel-Core`, which validates the signature and returns the associated asset. Any action derived from the tether (mint, transfer, verify) still flows through [Action approval](/mobile/action-approval) for biometric consent.
+
+<Note>
+  NFC tethering is a forward-looking surface. The service interface is wired through `lib/services/nfc_tethering_service.dart`, but the product flows that consume it are staged behind feature flags — see the upcoming RWA release notes.
+</Note>

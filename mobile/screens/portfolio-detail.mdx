@@ -1,0 +1,30 @@
+---
+title: "Portfolio detail"
+description: "PortfolioDetailScreen visualizes a single portfolio, lets you adjust allocations, and surfaces the AI reasoning behind its composition."
+---
+
+`PortfolioDetailScreen` is opened from `PortfoliosSection` on the dashboard. It renders a doughnut chart of the portfolio's allocations, an editable table of assets, and the AI reasoning logs that motivated each weight.
+
+## Widgets
+
+- **`SfCircularChart`** (Syncfusion doughnut) — one slice per asset. Weights are rendered as percentages and sum to 100%.
+- **Allocation editor** — sliders bound to the portfolio's asset map. Changing a weight marks the screen as *dirty* and enables the **Save** action.
+- **Reasoning pane** — consumes `reasoningLogsProvider` filtered by the active portfolio so the user can read why the AI proposed this composition.
+
+## Providers consumed
+
+| Provider | Used for |
+| :--- | :--- |
+| `marketServiceProvider` | Imperative calls to persist allocation changes |
+| `portfoliosProvider` | Source of truth for the portfolio list |
+| `reasoningLogsProvider` | AI commentary for this portfolio |
+| `assetHistoryProvider` | Spark lines per asset |
+| `livePriceProvider` | Latest prices powering the current valuation |
+
+## Saving changes
+
+Saving triggers `MarketService.savePortfolio(name, assets)` which posts to `POST /market/portfolios`. The response invalidates `portfoliosProvider`, so the dashboard and this screen both re-render with the new weights.
+
+<Note>
+  The total of all allocations must equal 100%. The **Save** button stays disabled until the validation passes.
+</Note>

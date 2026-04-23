@@ -1,0 +1,46 @@
+---
+title: "Create portfolio"
+description: "CreatePortfolioScreen walks you through picking assets and assigning weights until the total allocation hits 100%."
+---
+
+`CreatePortfolioScreen` opens from the `IconButton(Icons.add_box_outlined)` in the dashboard `AppBar`. It is the authoring surface for dynamic portfolios — the narrative baskets Vexel uses to drive AI rebalancing.
+
+## Inputs
+
+- **Name** — `portfolioName`, free-form string.
+- **Assets** — picked from `AssetPickerSheet`, which is backed by `searchResultsProvider(query)` and returns `MarketAsset` objects.
+- **Allocations** — per-asset slider bound to the mutable map. The **Save** action stays disabled until the sum is exactly 100%.
+
+## Flow
+
+<Steps>
+  <Step title="Open the sheet">
+    Tap **Add asset**. `AssetPickerSheet` opens a search bar wired to `searchResultsProvider`, so every keystroke fires `GET /market/search?q={query}` against `Vexel-Core`.
+  </Step>
+  <Step title="Add assets">
+    Pick one or more assets. Each selection appends a row to the allocation editor with a default weight.
+  </Step>
+  <Step title="Balance to 100%">
+    Adjust sliders. The footer shows the running total — you cannot save unless the total hits `100%`.
+  </Step>
+  <Step title="Save">
+    `_handleCreate` calls `ref.read(marketServiceProvider).savePortfolio(name, assets)`. A `POST /market/portfolios` request is sent with the JWT and the allocation map. On success, `portfoliosProvider` is invalidated and the dashboard re-renders with the new card.
+  </Step>
+</Steps>
+
+## Request payload
+
+```json
+{
+  "name": "Core AI Basket",
+  "assets": [
+    { "symbol": "BTC", "percentage": 0.5 },
+    { "symbol": "ETH", "percentage": 0.3 },
+    { "symbol": "NVDA", "percentage": 0.2 }
+  ]
+}
+```
+
+<Note>
+  `MarketService` normalizes the `percentage` field into a fraction between `0` and `1`. The UI renders percentages (`50%`) but the wire format stays decimal.
+</Note>

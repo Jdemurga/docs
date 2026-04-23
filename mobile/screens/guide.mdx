@@ -1,0 +1,15 @@
+---
+title: "Guide"
+description: "The in-app Guide is a two-tab onboarding surface — a usage manual for everyday features and a technical base that explains the Vexel model."
+---
+
+`GuideScreen` is opened from [Profile](/mobile/screens/profile). It uses `DefaultTabController` with two tabs:
+
+- **Usage manual** — cards describing how to use each surface (Dashboard, Market, Governance, Sovereign Link, and more). Tapping a card opens `GuideDetailScreen` with the expanded content.
+- **Technical base** — explainers of the conceptual layer (The Mesh, AI confidence, Lattice security, sovereign reasoning).
+
+Every card pulls titles, summaries, and long-form content from the localization JSON (`assets/lang/en.json`, `assets/lang/es.json`) through `ref.tr(...)`. Updating the user's language via [Profile](/mobile/screens/profile) automatically re-renders the guide with the new translations.
+
+<Note>
+  The Guide is the mobile mirror of the documentation site you are reading now. Use it as a quick in-app reference; come here for the full reference diagrams and API tables.
+</Note>
