@@ -86,7 +86,39 @@
         ]
       },
       {
-        "product": "VEXEL_MOBILE"
+        "product": "VEXEL_MOBILE",
+        "icon": "mobile-screen",
+        "tabs": [
+          {
+            "tab": "Guardian",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "mobile/introduction",
+                  "mobile/quickstart",
+                  "mobile/sovereign-link"
+                ]
+              },
+              {
+                "group": "App Surfaces",
+                "pages": [
+                  "mobile/dashboard",
+                  "mobile/action-approval"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": [
+                  "mobile/architecture",
+                  "mobile/tech-stack",
+                  "mobile/api",
+                  "mobile/security"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   }

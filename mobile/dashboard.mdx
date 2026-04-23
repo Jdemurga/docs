@@ -1,0 +1,72 @@
+---
+title: "Dashboard"
+description: "The DashboardScreen is the orchestration layer for authenticated users — net worth, yield velocity, neural allocation, portfolios, and watchlist."
+---
+
+`DashboardScreen` is the first surface a user lands on after authentication. It coordinates live prices, portfolios, and the watchlist while also hosting the `VoiceCommandWidget` and the bottom navigation bar.
+
+## Widget tree
+
+```mermaid
+graph TD
+    A[VexelApp] --> B(AuthWrapper)
+    B -- Authenticated --> C(DashboardScreen)
+
+    subgraph DashboardScreen
+        C --> C1(Scaffold)
+        C1 --> C2(AppBar)
+        C2 --> C2a(VexelLogo)
+        C2 --> C2b(Text 'Vexel')
+        C2 --> C2c(IconButton Add Portfolio)
+        C2 --> C2d(IconButton Search)
+
+        C1 --> C3(SingleChildScrollView)
+        C3 --> C3a(Column)
+        C3a --> C3b(NetWorthHeader)
+        C3b -- Watches --> P5(livePriceProvider)
+        C3a --> C3c(GrowthChart)
+        C3a --> C3d(PortfoliosSection)
+        C3d -- Watches --> P7(portfoliosProvider)
+        C3d --> C3e(PortfolioListItem)
+        C3a --> C3f(Text 'My Assets')
+        C3a --> C3h(ListView.builder)
+        C3h -- Watches --> P6(watchlistProvider)
+        C3h -- Watches --> P5(livePriceProvider)
+        C3h --> C3i(AssetCard)
+
+        C1 --> C4(FloatingActionButton VoiceCommandWidget)
+        C4 -- Uses --> SpeechToText
+
+        C1 --> C5(BottomNavigationBar)
+        C5 --> C5b(Watchlist -> WatchlistScreen)
+        C5 --> C5c(Sovereign Link -> SovereignScannerScreen)
+        C5 --> C5d(Profile -> ProfileScreen)
+    end
+```
+
+## Key widgets
+
+- **`NetWorthHeader`** — total market value of all holdings. Watches `livePriceProvider` and recomputes on every Mesh pulse.
+- **`GrowthChart`** — Syncfusion-powered line chart showing your portfolio performance.
+- **`PortfoliosSection`** — lists every portfolio returned by `portfoliosProvider`. Tapping one opens `PortfolioDetailScreen`.
+- **`AssetCard`** — compact watchlist row with symbol, name, live price, and 24h change. Tapping one opens `AssetDetailScreen`.
+- **`VoiceCommandWidget`** — the floating action button that opens speech recognition. Commands are parsed and routed to the appropriate service action.
+- **`ActionApprovalDialog`** — dispatched automatically whenever a `pending_action` event arrives over the WebSocket.
+
+## Creating a dynamic portfolio
+
+1. Tap the `Icons.add_box_outlined` icon in the `AppBar` to open `CreatePortfolioScreen`.
+2. Provide a `portfolioName` and add `MarketAsset`s through `AssetPickerSheet` (backed by `searchResultsProvider`).
+3. Adjust allocations until the total equals 100%.
+4. Press **Save** — `_handleCreate` calls `ref.read(marketServiceProvider).savePortfolio(name, assets)`.
+5. `MarketService` sends `POST /market/portfolios` with the JWT and allocation map.
+6. On success, `portfoliosProvider` is invalidated; `DashboardScreen` and `PortfolioDetailScreen` refetch and re-render.
+
+## Bottom navigation
+
+| Index | Destination | Screen |
+| :--- | :--- | :--- |
+| 0 | Portfolio home | `DashboardScreen` content |
+| 1 | Watchlist | `WatchlistScreen` |
+| 2 | Sovereign Link | `SovereignScannerScreen` |
+| 3 | Profile | `ProfileScreen` |

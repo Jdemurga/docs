@@ -1,0 +1,43 @@
+---
+title: "Security posture"
+description: "How Vexel Mobile — the Sovereign Guardian — protects credentials, authorizes writes, and minimizes its own attack surface."
+---
+
+Security is the central design principle of Vexel Mobile. As the **Sovereign Guardian** of the Vexel ecosystem, the app is the only device that can authorize a write. Every layer below exists to preserve that guarantee.
+
+## JWT storage
+
+Authentication is performed via JSON Web Tokens issued by `Vexel-Core` at `/auth/login` and `/auth/signup`. Tokens are persisted in `FlutterSecureStorage`, which uses the platform keystore (Keychain on iOS, EncryptedSharedPreferences on Android). Tokens never touch unencrypted shared preferences or the filesystem.
+
+## Biometric gates
+
+`local_auth` drives FaceID, TouchID, and fingerprint prompts through the `BiometricController`. Biometrics are required for:
+
+- Every `pending_action` received over Socket.io (see [Action approval](/mobile/action-approval)).
+- Any locally initiated write such as `savePortfolio`.
+- Optional app-launch re-authentication when the user enables it in Profile.
+
+## Post-quantum (simulated) signatures
+
+`AuthService.authorizeAction` produces two signatures for every approved action:
+
+1. A standard device-bound signature.
+2. A **simulated Lattice-based PQC signature**, prefixed `pqc_shield_...LATTICE_SALT_SIM`.
+
+The PQC path is a placeholder reserved for a future migration to production post-quantum primitives. The simulation exists today so downstream services can be wired through the final pipeline without a breaking change later.
+
+## No private keys on device
+
+The architecture explicitly states that **private keys and sensitive AI logic are never stored on the phone**. Key material lives server-side in `Vexel-Core` hardware-backed custody. A compromised handset cannot move capital on its own — it can only request signatures on behalf of its user.
+
+## Mobile-exclusive authorization
+
+All write actions — buy, sell, rebalance, vote, link, revoke — must originate or be strictly verified through `ActionApprovalDialog` on the phone. Vexel Horizon and every other surface are read-heavy by design. The mobile signature is the single commit point.
+
+## Transport
+
+All REST and WebSocket traffic is required to run over HTTPS and WSS. `AppConfig.baseUrl` is `https://vexel.es` by default; any override must continue to use TLS. Certificate validation is handled by the platform stack.
+
+<Warning>
+  Never ship a build that bypasses `FlutterSecureStorage`, disables biometric prompts on write paths, or relaxes TLS. These are non-negotiable invariants of the Guardian model.
+</Warning>

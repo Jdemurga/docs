@@ -1,0 +1,66 @@
+---
+title: "Vexel Mobile: The Sovereign Guardian"
+description: "Vexel Mobile is the biometric authentication hub and portfolio control surface for the Vexel ecosystem — every write action on Vexel Horizon is signed here."
+---
+
+Vexel Mobile, known as **The Guardian**, is the primary user interface and biometric authentication layer of the Vexel ecosystem. It serves as your personal portal for managing AI-driven dynamic portfolios, executing transactions, and authorizing sessions on other Vexel surfaces such as Vexel Horizon.
+
+Built with Flutter and powered by Riverpod, the app is designed around a simple principle: **no private keys, no sensitive AI logic, and no write authorization ever happens on any device other than your phone.**
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Dynamic portfolios" icon="chart-pie">
+    Create and manage asset baskets with precise percentage allocations. AI-driven rebalancing suggestions are delivered as proposals you explicitly approve.
+  </Card>
+  <Card title="High-density dashboard" icon="gauge">
+    Instant view of net worth, yield velocity, and a personalized portfolio breakdown, powered by live Mesh pulses over WebSockets.
+  </Card>
+  <Card title="Sovereign Link" icon="link">
+    Biometric QR-based authentication that unlocks and synchronizes your session with the Vexel Horizon web terminal.
+  </Card>
+  <Card title="Voice commands" icon="microphone">
+    Hands-free interaction to query the market or request portfolio summaries using `speech_to_text`.
+  </Card>
+  <Card title="Post-quantum security" icon="shield-halved">
+    Simulated Lattice-based signatures accompany every authorization, preparing the ecosystem for post-quantum threats.
+  </Card>
+  <Card title="RWA tethering" icon="nfc">
+    NFC read/write support for binding real-world assets through the `NfcTetheringService`.
+  </Card>
+</CardGroup>
+
+## The Guardian principle
+
+Vexel Mobile is the only device that can commit capital in the Vexel ecosystem. Every write action — a portfolio rebalance, an AI proposal approval, a DAO vote triggered from Horizon — arrives at the phone as a `pending_action` event over Socket.io and is displayed inside the `ActionApprovalDialog`. The user reviews the details, presses **Sign and Authorize**, authenticates via FaceID, TouchID, or fingerprint, and the app relays the signature to Vexel Core via `POST /auth/authorize`.
+
+This design keeps the attack surface on mobile minimal. The app never stores private keys and never runs sensitive AI logic locally — Vexel Core handles inference and cryptographic validation, while the phone owns the one thing that cannot be phished remotely: the user's biometric intent.
+
+## What's inside the app
+
+- **Dashboard** — live net worth, yield velocity, neural allocation, watchlist, and AI-driven portfolio proposals.
+- **Market** — asset search, trending lists, detail screens with charts, forecast, and news.
+- **Simulation Lab** — what-if scenario modelling reachable from any asset detail screen.
+- **Sovereign Scanner** — QR scanner for linking sessions with Vexel Horizon.
+- **Watchlist** — assets you are following, with real-time price updates.
+- **Profile** — account settings, language, theme, and session revocation.
+
+## Architecture at a glance
+
+Vexel Mobile uses a layered architecture with strong MVVM principles, powered by Riverpod for reactive state management.
+
+| Layer | Location | Responsibility |
+| :--- | :--- | :--- |
+| Entry point | `lib/main.dart` | `ProviderScope`, theme wiring, `AuthWrapper`, WebSocket bootstrap |
+| Core config | `lib/core/config/` | `AppConfig` — API and WebSocket URLs |
+| Models | `lib/models/` | Data entities such as `MarketAsset` |
+| Screens | `lib/screens/` | Presentation widgets for every route |
+| Services | `lib/services/` | `AuthService`, `MarketService`, `BiometricController`, `LocalizationService`, `ThemeService`, `NfcTetheringService`, `UserService` |
+| Widgets | `lib/widgets/` | Reusable UI such as `AssetCard`, `ActionApprovalDialog`, `VoiceCommandWidget` |
+| Localization | `assets/lang/` | JSON translation files (`en.json`, `es.json`) |
+
+See [Architecture](/mobile/architecture) for the full component diagram and data flow.
+
+<Note>
+  Vexel Mobile communicates with the `Vexel-Core` backend over HTTPS and Socket.io. All endpoints are derived from `AppConfig` (`https://vexel.es/api` by default). See [API reference](/mobile/api) for the complete list.
+</Note>

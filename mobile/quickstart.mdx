@@ -1,0 +1,62 @@
+---
+title: "Get started with Vexel Mobile"
+description: "Install the Flutter toolchain, clone Vexel Mobile, install dependencies, and launch the app on a device or emulator."
+---
+
+This guide walks you from a fresh machine to a running Vexel Mobile build. The app targets Android and iOS and is built with Flutter (Dart SDK `^3.7.2`).
+
+## Prerequisites
+
+- **Flutter SDK** with Dart `^3.7.2`. Verify with `flutter doctor`.
+- **Android Studio** or **Xcode** (iOS builds require macOS).
+- A physical device or a running emulator/simulator.
+- Access to a reachable `Vexel-Core` backend — the default base URL is `https://vexel.es`, configurable in `lib/core/config/app_config.dart`.
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone [URL_DEL_REPOSITORIO]
+    cd vexel-mobile
+    ```
+  </Step>
+  <Step title="Install dependencies">
+    Download every package listed in `pubspec.yaml`:
+
+    ```bash
+    flutter pub get
+    ```
+  </Step>
+  <Step title="Generate launcher icons (optional)">
+    If you customize the launcher icons declared under `flutter_launcher_icons` in `pubspec.yaml`, regenerate them:
+
+    ```bash
+    flutter pub run flutter_launcher_icons:main
+    ```
+  </Step>
+  <Step title="Connect a device">
+    Connect an Android or iOS device via USB, or start an emulator or simulator. Confirm it appears in `flutter devices`.
+  </Step>
+  <Step title="Run the app">
+    ```bash
+    flutter run
+    ```
+
+    The build compiles and deploys to the selected target. Use `flutter run --debug` for debugging, or `flutter run --release` for a production-optimized build.
+  </Step>
+</Steps>
+
+<Tip>
+  If you run into stale dependency or build-cache issues, reset the project with:
+
+  ```bash
+  flutter clean
+  flutter pub get
+  flutter run
+  ```
+</Tip>
+
+## First launch
+
+The first screen after install is the `AuthWrapper`, which routes unauthenticated users to `LoginScreen` (or `RegisterScreen` from the secondary action). After a successful login, `authStateProvider` emits an authenticated state and the app lands on `DashboardScreen` — the hub for portfolios, watchlist, and the Sovereign Link.
+
+See [Sovereign Link](/mobile/sovereign-link) to pair the app with Vexel Horizon, or jump to the [Dashboard](/mobile/dashboard) reference to understand what you are looking at.

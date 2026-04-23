@@ -1,0 +1,55 @@
+---
+title: "Sovereign Link"
+description: "Pair Vexel Mobile with the Vexel Horizon web terminal by scanning a QR code and binding your biometric identity to the browser session."
+---
+
+**Sovereign Link** is the biometric QR flow that connects Vexel Mobile to the Vexel Horizon web terminal. After pairing, the browser is elevated from Guest Mode to Sovereign Mode and every write action originating on the web is routed to the phone for biometric approval.
+
+## Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant VexelMobile
+    participant VexelHorizon
+    participant VexelCore
+
+    User->>VexelHorizon: Opens the web terminal
+    VexelHorizon->>VexelHorizon: Generates a QR with a unique sessionId
+    VexelHorizon->>User: Shows the QR
+    User->>VexelMobile: Navigates to SovereignScannerScreen
+    VexelMobile->>User: Activates the camera
+    User->>VexelMobile: Scans the Horizon QR
+    VexelMobile->>VexelMobile: Decodes the sessionId
+    VexelMobile->>AuthService: linkSession(sessionId)
+    AuthService->>VexelCore: HTTP POST /auth/link (JWT, sessionId)
+    VexelCore->>VexelCore: Validates the JWT and sessionId
+    VexelCore-->>VexelHorizon: Emits sessionLinked via Socket.io to the sessionId room
+    VexelHorizon->>User: Unlocks Pro features
+    VexelMobile->>User: Shows success and closes the scanner
+```
+
+## How to pair a device
+
+<Steps>
+  <Step title="Open Vexel Horizon">
+    In your desktop browser, navigate to Vexel Horizon. Click **Authorize Guardian** or **Authorize Pro Features**. A QR code appears along with a session ID such as `[SESSIONID: 4f2c-9a11]`.
+  </Step>
+  <Step title="Launch the Sovereign Scanner">
+    On Vexel Mobile, open the bottom navigation and tap **Sovereign Link** (or navigate via **Profile > Sovereign Link**). The camera activates inside `SovereignScannerScreen`.
+  </Step>
+  <Step title="Scan the QR">
+    Point the camera at the QR code on the Horizon terminal. The app decodes the `sessionId` and calls `AuthService.linkSession(sessionId)`, which posts `POST /auth/link` to `Vexel-Core`.
+  </Step>
+  <Step title="Session is linked">
+    `Vexel-Core` validates the JWT and session ID, then emits a `sessionLinked` Socket.io event to the session's room. Horizon removes the frosted-glass blur, loads your personal vault data, and the mobile app shows a success confirmation before closing the scanner.
+  </Step>
+</Steps>
+
+<Note>
+  The phone is the only device that owns your biometric credentials. Pairing is symmetric but intent-asymmetric: Horizon can request actions, but only Vexel Mobile can sign them.
+</Note>
+
+## Revoking a session
+
+Open **Profile**, find the active web session in the list, and tap **Revoke**. The `_ProfileScreenState` emits a `session_revoked` Socket.io event carrying the specific web `sessionId`. Horizon receives the event, drops back into Guest Mode, and re-applies the blur to Pro surfaces.

@@ -1,0 +1,35 @@
+---
+title: "Technology stack"
+description: "Pinned versions for every dependency that ships with Vexel Mobile — framework, state management, charts, networking, biometrics, and tooling."
+---
+
+Vexel Mobile is built on a pinned set of Flutter packages. Keep these versions in sync with `pubspec.yaml` when upgrading.
+
+| Category | Technology | Version | Description |
+| :--- | :--- | :--- | :--- |
+| Mobile framework | Flutter | Dart SDK `^3.7.2` | Google's cross-platform UI toolkit |
+| State management | Riverpod | `2.6.1` | Reactive, immutable state framework |
+| Charts and visuals | Syncfusion Charts | `31.1.19` | High-performance charting for financial data |
+| HTTP client | http | `1.6.0` | REST client for `Vexel-Core` |
+| WebSocket client | socket_io_client | `3.1.4` | Real-time communication with `Vexel-Core` |
+| Secure storage | flutter_secure_storage | `10.0.0` | Stores JWTs and preferences in the device keystore |
+| Biometric auth | local_auth | `2.3.0` | FaceID, TouchID, and fingerprint prompts |
+| Speech recognition | speech_to_text | `7.0.0` | Backs the `VoiceCommandWidget` |
+| QR scanning | mobile_scanner | `6.0.4` | Sovereign Link QR reader |
+| NFC | nfc_manager | `3.3.0` | Read/write NFC for RWA tethering |
+| Internationalization | intl | `0.20.2` | Locale-aware date and number formatting |
+| Fonts | google_fonts | `6.3.2` | Bundles the `Inter` font family |
+| Icons | cupertino_icons | `1.0.8` | iOS-style icon set |
+| Dev tooling | flutter_lints | `5.0.0` | Recommended lint rules |
+| Launcher icons | flutter_launcher_icons | `0.13.1` | Generates platform launcher icons |
+
+## Updating dependencies
+
+After bumping any version in `pubspec.yaml`:
+
+```bash
+flutter pub get
+flutter pub outdated
+```
+
+Then run the full test suite with `flutter test` and manually smoke-test the affected surface before committing.
