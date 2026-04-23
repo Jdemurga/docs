@@ -145,5 +145,5 @@ Response:
 ```
 
 <Info>
-  The optimizer is stateless per request. Horizon sends a window of trade results each time weights need to be refreshed.
+  The adaptive engine persists the updated weights to `optimized_weights.json` on disk so they survive restarts. Successful trades amplify a dimension by `1.05x` (capped at `0.8`), failures shrink it by `0.95x` (floored at `0.05`), and the weight vector is renormalized to sum to `1.0` before being saved.
 </Info>
