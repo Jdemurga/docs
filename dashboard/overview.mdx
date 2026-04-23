@@ -1,21 +1,21 @@
 ---
 title: "Dashboard Overview: Your Sovereign Vault"
-description: "The Vexel Horizon dashboard shows your real-time portfolio balance, yield velocity, AI confidence score, and a live performance chart in Sovereign Mode."
+description: "The Vexel Horizon dashboard displays your total liquidity, neural allocation, AI proposals, and live market intelligence in Sovereign or Guest mode."
 ---
 
-The dashboard is the central view of Vexel Horizon, merging live market data with your personal or ecosystem-level financial intelligence. Every number on the screen updates in real time — there is no page refresh and no polling delay. Whether you are browsing as a guest or operating inside an authenticated Sovereign session, the dashboard surfaces the same layout with different data scoped to your context.
+The Dashboard is the central view of Vexel Horizon, fusing live market data with your personal or ecosystem-level financial intelligence. Every figure on screen updates in real time — no refresh, no polling delay. Whether you are browsing as a guest or operating inside an authenticated Sovereign session, the dashboard renders the same layout with data scoped to your context.
 
-## Two modes
+## Two operating modes
 
-The dashboard operates in two distinct states depending on whether you have an active Sovereign Link session.
+The dashboard runs in one of two states depending on whether you have an active Sovereign Link session.
 
 <Tabs>
-  <Tab title="Collective Mode (guest)">
-    When you visit Vexel Horizon without authenticating, the dashboard runs in **Collective Mode**. Instead of your personal wealth, you see aggregate data for the entire Vexel network.
+  <Tab title="Guest Mode (unauthenticated)">
+    When you visit Vexel Horizon without authenticating, the dashboard runs in **Guest Mode**. It shows aggregate ecosystem data instead of personal wealth, and every Pro-only surface (Neural Allocation, AI Recommendation, AI Proposals) is covered by a frosted glass blur until you authenticate.
 
-    - The primary card displays **Global Ecosystem Value** — the total net worth across all Sovereign nodes on the Mesh.
+    - The primary card displays **Global Ecosystem Value** — total value across all Sovereign nodes on The Mesh.
     - The yield counter shows **Collective Velocity**, the ecosystem-wide capital growth rate per second.
-    - The performance chart renders the **Vexel Ecosystem Index**, sourced from public history.
+    - The Market Intelligence chart renders the **Vexel Ecosystem Index**.
 
     Data is fetched from two public endpoints on load:
 
@@ -24,78 +24,87 @@ The dashboard operates in two distinct states depending on whether you have an a
     GET /api/market/public/yield/status
     ```
 
-    The feed also posts a `CORE` message showing the number of active Sovereign nodes currently linked to the Mesh.
+    A `CORE` message in the feed confirms the number of active Sovereign nodes currently linked to The Mesh.
   </Tab>
   <Tab title="Sovereign Mode (authenticated)">
-    Once you complete a Sovereign Link session, the dashboard switches to **Sovereign Mode** and reloads with data scoped to your account.
+    After a successful Sovereign Link session, the dashboard switches to **Sovereign Mode**. The `body` element receives the `is-sovereign` class, which automatically removes the blur from every Pro-only card and unlocks the full layout.
 
     - The primary card label becomes **[Your Name] Vault Value**, populated from your stored profile.
     - The yield counter shows **Personal Velocity** — your individual capital growth rate per second.
-    - The performance chart renders your **Personal Portfolio Performance**.
+    - The Market Intelligence chart renders your **Personal Portfolio performance**.
 
-    Data is fetched from two authenticated endpoints on load:
+    Data is fetched from authenticated endpoints on load:
 
     ```
     GET /api/market/dashboard
     GET /api/market/yield/personal
+    GET /api/market/history?symbol=BTC&type=crypto
     ```
   </Tab>
 </Tabs>
 
-## Dashboard cards
+## Dashboard layout
 
-<CardGroup cols={3}>
-  <Card title="Portfolio Balance / Global Ecosystem Value">
-    Displays the current total value in USD, formatted to two decimal places and updated every 100 ms via linear interpolation between Mesh pulses. In Sovereign Mode the label reads your name; in Collective Mode it reads "Global Ecosystem Value".
+The Dashboard is a three-column grid: a stats column on the left, and a wide main column on the right that spans two grid cells.
+
+### Left column — stats
+
+<CardGroup cols={1}>
+  <Card title="Total Liquidity">
+    Displays the current total value in USD, formatted to two decimal places and updated every 100 ms via linear interpolation between Mesh pulses. In Sovereign Mode the header reads "[Your Name] Vault Value"; in Guest Mode it reads "Global Ecosystem Value". A **Velocity** line underneath shows either **Personal Velocity** or **Collective Velocity** in dollars per second.
   </Card>
-  <Card title="AI Strategy Status">
-    Shows the current state of the neural execution layer. When active, this card displays `NEURAL_AUTO_ON` and reports the number of active neural orders running against your portfolio.
+  <Card title="Neural Allocation (Pro)">
+    A Chart.js doughnut chart showing the breakdown of your Sovereign portfolio across assets — BTC, ETH, AAPL, Cash by default. The chart updates whenever the server returns an `allocation` map with the dashboard payload. Blurred in Guest Mode.
   </Card>
-  <Card title="Guardian Link">
-    Reflects the state of your Sovereign Guardian session. A verified session shows `SECURED` with the sub-label **Biometric ID Verified**. This card confirms that your mobile signature key is active and your session has not been revoked.
+  <Card title="AI Recommendation (Pro)">
+    A high-conviction neural pick with short reasoning — for example, *BUY BTC @ $64k — 14% deviation from 200EMA with bullish news sentiment*. Also blurred in Guest Mode.
   </Card>
 </CardGroup>
 
-## Portfolio Performance chart
+### Main column — AI Proposals and Market Intelligence
 
-The chart spans two columns of the dashboard grid and renders a filled line graph of price or portfolio value over time. Use the time-filter buttons above the chart to change the visible window:
+The main column stacks two cards.
 
-| Filter | Description |
-|--------|-------------|
-| `1D` | Last 24 hours (default) |
-| `1W` | Last 7 days |
-| `1M` | Last 30 days |
-| `ALL` | Full available history |
+**AI Proposals for Your Success** — a list of personalized, actionable proposals such as:
 
-In Collective Mode the chart dataset label is **Vexel Ecosystem Index**. In Sovereign Mode it is **Personal Portfolio performance**. Both datasets are sourced from their respective history endpoints on initialization and re-rendered whenever you switch the time filter.
+- **🔄 Portfolio Rebalance** — notifies you when a portfolio drifts from target allocations and offers one-click Approve / View on Mobile actions.
+- **📈 Emerging Opportunity** — surfaces newly listed RWA assets or trending signals that match your risk profile.
 
-<Note>
-  The chart updates in real time as `marketPulse` socket events arrive from the Mesh. You do not need to interact with it to keep the data current.
-</Note>
+Each proposal has two buttons: **View on Mobile** (dispatches an informational push to Vexel Mobile) and **Approve Now** (opens the Sovereign Guardian modal for biometric signing).
 
-## AI Proactive Signals feed
+**Market Intelligence** — a Chart.js line graph tracking portfolio performance or the Ecosystem Index over time, with **LIVE** and **PRO MODE** toggles in the card header.
 
-The right column of the dashboard grid shows the **AI Proactive Signals** feed. This panel surfaces autonomous buy, sell, and strategy recommendations generated by the neural network, along with `CORE` and `SYSTEM` messages about Mesh activity and connection status.
+## Main header
 
-Each actionable signal includes an **Approve** button. Clicking it opens the Sovereign Guardian modal, which requires a mobile signature before the trade is submitted.
+The top header carries three elements:
 
-<Warning>
-  You must be in an active Sovereign Link session to approve trades. Unauthenticated users can view signals but cannot submit approvals.
-</Warning>
+- **Title + system status** — the terminal name, a **Sovereign Terminal** badge, a pulsing connection indicator, and the live `Mesh Latency` reading (for example, `Mesh Latency: 14ms`).
+- **Market ticker** — a scrolling ticker of the most-watched assets (BTC, ETH, AAPL, PAXG), populated by the `marketPulse` event.
+- **Authorize Guardian button** — opens the Sovereign Link authentication screen when you are not yet in a Sovereign session.
 
-See [AI Proactive Signals](/dashboard/ai-signals) for a full breakdown of signal types and how to act on them.
+## Real-time updates via The Mesh
 
-## Real-time updates via the Mesh
-
-The dashboard subscribes to the `marketPulse` Socket.io event. The Mesh emits this event approximately every 15 seconds, delivering an updated `totalValue`, `yieldVelocity`, and `confidence` score.
+The dashboard subscribes to the `marketPulse` Socket.io event. The Mesh emits this event approximately every 15 seconds, delivering an updated `totalValue`, `yieldVelocity`, `globalSentiment`, and asset prices.
 
 When a pulse arrives:
 
 - `currentNetWorth` and `yieldVelocity` are updated immediately.
-- The `yieldVelocity` display refreshes to the new value formatted as `+$X.XXXX/sec`.
-- The AI Confidence display updates to the new percentage.
+- The velocity display refreshes to the new value formatted as `+$X.XXXX/sec`.
+- The market ticker repaints with the latest prices.
 - The system status indicator pulses green for 500 ms, then returns to blue.
 
-Between pulses, a 100 ms interval interpolates the net worth forward, keeping the counter visually smooth without waiting for the next Mesh heartbeat.
+Between pulses, a 100 ms interval interpolates the net worth forward, keeping the counter smooth without waiting for the next Mesh heartbeat.
+
+<Note>
+  You do not need to interact with the dashboard to keep the data current. The chart, ticker, and cards all listen to socket events directly.
+</Note>
+
+## AI Proposals feed
+
+The secondary feed (`aiFeed` / `aiSignalsFeed`) logs Mesh activity, intent confirmations, and security events alongside the dashboard. Each actionable signal includes an **Approve** button. Clicking it opens the Sovereign Guardian modal, which requires a mobile signature before the action is submitted.
+
+See [AI Proposals](/dashboard/ai-signals) for a full breakdown of proposal types and how to act on them.
+
+## Yield Velocity
 
 For a detailed explanation of how Yield Velocity is calculated and displayed, see [What Is Yield Velocity?](/dashboard/yield-velocity).

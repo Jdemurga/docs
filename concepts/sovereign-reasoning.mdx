@@ -7,10 +7,11 @@ Vexel's AI does not operate as a black box. **Sovereign Reasoning** is the trans
 
 ## Where to see Sovereign Reasoning
 
-You encounter Sovereign Reasoning in two places:
+You encounter Sovereign Reasoning in three places:
 
-- **AI Proactive Signals feed** on the Dashboard — a live stream of signals, intent confirmations, network events, and audit records
-- **Execution feedback panel** in the Trading section — contextual reasoning attached to each completed trade, including the AI's assessment of the action
+- **AI Proposals card** on the Dashboard — personalized, actionable recommendations with human-readable rationale attached to each one
+- **Activity feed** (`aiFeed` / `aiSignalsFeed`) — a live stream of Mesh events, intent confirmations, security notices, and ledger records
+- **Intelligence Lab analysis block** — the plain-language reasoning that accompanies each what-if simulation result
 
 ## Feed entry types
 
@@ -43,15 +44,15 @@ Each entry in the Sovereign Reasoning feed is prefixed with a label that tells y
   </Accordion>
 </AccordionGroup>
 
-## Collective Mode vs. Sovereign Mode
+## Guest Mode vs. Sovereign Mode
 
 The feed adapts based on your authentication state:
 
-- **Collective Mode** (no active Sovereign session) — the feed shows ecosystem-level signals: network activity, trending asset detections, and Mesh status entries
-- **Sovereign Mode** (Sovereign session active) — the feed shows your personal signals: trade recommendations, intent confirmations, autonomous strategy notifications, and your personal LEDGER entries
+- **Guest Mode** (no active Sovereign session) — the feed shows ecosystem-level signals: network activity, trending asset detections, and Mesh status entries. Pro-only surfaces (AI Proposals, Neural Allocation) stay blurred.
+- **Sovereign Mode** (Sovereign session active) — the feed shows your personal signals: trade recommendations, intent confirmations, autonomous strategy notifications, and your personal LEDGER entries.
 
 <Info>
-  Your Dashboard header and yield labels also shift between modes. In Collective Mode, the Dashboard shows "Global Ecosystem Value" and "Collective Velocity." In Sovereign Mode, these update to your personal vault value and personal yield velocity.
+  Your Dashboard header and yield labels also shift between modes. In Guest Mode, the Dashboard shows "Global Ecosystem Value" and "Collective Velocity." In Sovereign Mode, these update to your personal vault value and personal yield velocity.
 </Info>
 
 ## Asking the AI to explain a signal

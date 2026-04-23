@@ -1,49 +1,45 @@
 ---
-title: "Vexel Horizon: AI-Powered Sovereign Finance Platform"
-description: "Vexel Horizon is an institutional-grade financial terminal combining AI trading signals, RWA tokenization, DAO governance, and real-time portfolio intelligence."
+title: "Vexel Horizon: The Sovereign Intelligence Terminal"
+description: "Vexel Horizon is the professional, read-heavy web terminal for the Vexel ecosystem — combining AI proposals, market intelligence, what-if simulations, and DAO governance."
 ---
 
-Vexel Horizon is the web hub of the Vexel ecosystem — a professional financial terminal that puts institutional-grade intelligence directly in your browser. It aggregates live market data, runs AI-driven trading signals, surfaces real-world asset opportunities, and routes every write operation through your biometric identity on Vexel Mobile. Whether you are monitoring global ecosystem health as a guest or managing your personal vault as an authenticated sovereign, Vexel Horizon adapts to your session state in real time.
+Vexel Horizon is the professional-grade web terminal of the Vexel ecosystem — a high-density, read-focused dashboard designed to extend Vexel Mobile. Guests see global Mesh metrics and a blurred preview of Pro features; Sovereign users unlock personal vault data, AI proposals, what-if simulations, and DAO voting. By design, the terminal does not execute trades directly: every write action is handed off to your Vexel Mobile device for biometric approval.
 
 ## Two operating modes
 
-Vexel Horizon runs in one of two modes depending on whether you have linked a Vexel Mobile session.
+**Guest Mode** is the default state on load. Local storage is empty, so Vexel Horizon shows public ecosystem metrics — total ecosystem value, collective yield velocity, trending assets, and Mesh status. Pro surfaces (AI Proposals, Neural Allocation, Intelligence Lab, Community Board) are covered by a frosted glass blur until you authenticate.
 
-**Collective Mode** is the default for unauthenticated visitors. The dashboard shows global ecosystem statistics — total ecosystem value, collective yield velocity, trending assets, and the AI confidence score for the broader Vexel network. You can browse the Market Hub and RWA Nexus freely in this mode.
-
-**Sovereign Mode** activates automatically once you authenticate via Sovereign Link. The terminal switches to your personal vault: your net worth replaces the global ecosystem value, yield velocity reflects your individual portfolio, and write operations such as trading, governance voting, and neural strategy deployment become available.
+**Sovereign Mode** activates automatically when the `sessionLinked` WebSocket event confirms a successful scan of the Sovereign Link QR from Vexel Mobile. The `body` receives the `is-sovereign` class, which removes every blur and swaps ecosystem data for your personal vault — net worth, neural allocation, AI proposals, and portfolio performance.
 
 ## Key features
 
 <CardGroup cols={2}>
   <Card title="Dashboard" icon="gauge">
-    Your real-time vault overview. Displays net worth or global ecosystem value, yield velocity ticking per second, AI confidence score, and an interactive portfolio performance chart.
+    Your real-time vault overview. Total Liquidity, Yield Velocity, Neural Allocation doughnut chart, AI Recommendation, and a Market Intelligence line chart — all updated on every Mesh pulse.
   </Card>
-  <Card title="Market Hub" icon="chart-line">
-    An institutional data terminal that aggregates live prices for crypto, equities, and commodities. Search assets by symbol and view the AI confidence score for each.
+  <Card title="Market Hub" icon="globe">
+    A live trending grid with AI confidence scores for crypto, equities, and commodities. The Mesh ticker in the header keeps the most-watched assets visible anywhere in the terminal.
   </Card>
-  <Card title="RWA Nexus" icon="landmark">
-    Browse and invest in tokenized real-world assets — gold, real estate, and institutional debt — each backed by a legal audit report and fractionally accessible on-chain.
+  <Card title="Intelligence Lab" icon="flask">
+    A what-if simulation engine. Pick a macro scenario — Crypto Hyper-adoption, Systemic Credit Crunch, Inflation Spike — and the Lab returns a projected impact chart with human-readable AI reasoning.
   </Card>
-  <Card title="Trading Engine" icon="rotate">
-    Execute swaps between supported assets. Every order passes an AI security scan before submission, and final authorization is signed from Vexel Mobile.
+  <Card title="Community Board" icon="people-group">
+    The DAO governance surface. Review active proposals with Neural Consensus insights and authorize Support or Against votes from Vexel Mobile.
   </Card>
-  <Card title="Neural Strategist" icon="brain">
-    A no-code visual canvas for building automated trading strategies. Drag-and-drop AI Sentiment, Yield Scan, Threshold Check, and Auto-Swap nodes, then deploy to the Vexel Mesh.
-  </Card>
-  <Card title="Governance" icon="scale-balanced">
-    Participate in the Vexel DAO. Review active proposals, read the Neural Consensus analysis, and cast cryptographically signed votes directly from the terminal.
-  </Card>
-  <Card title="AI Chat" icon="comment-dots">
-    A conversational interface — accessible via the voice assistant button — that accepts typed or spoken commands to analyze markets, explain signals, and initiate actions.
+  <Card title="AI Chat and Voice" icon="comment-dots">
+    A conversational interface — typed or spoken — that accepts commands to analyze markets, explain signals, and route actions to your mobile device.
   </Card>
   <Card title="Lattice Security" icon="shield-halved">
-    Every write operation is protected by lattice-based cryptography, resistant to quantum computing attacks, and verified through the Sovereign Guardian signing protocol.
+    Every write action is protected by lattice-based cryptography, resistant to quantum attacks, and verified through the Sovereign Guardian signing flow.
   </Card>
 </CardGroup>
 
+## Read-heavy by design
+
+Horizon is fundamentally a read-heavy client. It displays deep insights, but it does not execute trades directly. Clicking **Approve** on any AI Proposal, **Sync Strategy to Mobile** in the Intelligence Lab, or **Support / Against** on a proposal triggers a Sovereign Guardian WebSocket request that pushes a biometric prompt to your Vexel Mobile device. The mobile signature is the only thing that can commit capital — the terminal alone cannot.
+
 ## Sovereign Link requirement
 
-Read-only sections — Dashboard (in Collective Mode), Market Hub, and RWA Nexus — are accessible without authentication. Any operation that writes to the Vexel Mesh requires a linked Sovereign session: trading, governance voting, neural strategy deployment, and risk insurance activation all prompt the Sovereign Guardian modal and wait for a cryptographic signature from your Vexel Mobile app.
+The Dashboard (in Guest Mode) and the Market Hub are accessible without authentication. The Intelligence Lab and Community Board are protected sections: attempting to navigate to them without a session redirects automatically to the Sovereign Link QR screen. Approving any AI Proposal also requires an active Sovereign session.
 
 See [Authenticate with Sovereign Link](/sovereign-link) to set up your session before proceeding.

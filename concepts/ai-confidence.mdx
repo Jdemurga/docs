@@ -20,14 +20,14 @@ A high score means the models converge strongly on the same outcome. A lower sco
 ## Where you see AI Confidence
 
 <CardGroup cols={3}>
-  <Card title="Dashboard — AI Confidence card" icon="gauge">
-    Shows the network-wide confidence level (for example, 96.5%). This is an aggregate score across all active neural models, not tied to a single asset. It updates in real-time via the `marketPulse` Socket.io event from The Mesh.
+  <Card title="Dashboard — AI Recommendation" icon="gauge">
+    The AI Recommendation card surfaces a top-conviction neural pick with short reasoning. The underlying confidence score drives whether the pick is surfaced at all — only high-confidence outputs reach the card.
   </Card>
-  <Card title="Market Hub — asset table" icon="table">
-    The **AI CONFIDENCE** column displays a per-asset confidence score for every instrument listed. Use this column to compare the neural certainty across assets at a glance.
+  <Card title="Market Hub — trending grid" icon="table">
+    Each trending asset card shows a **Neural Confidence** reading (for example, `Neural Confidence: 87.3%`). The score is specific to the trend signal detected for that asset.
   </Card>
-  <Card title="Trending Assets" icon="arrow-trend-up">
-    Each trending asset card shows a **Neural Confidence** reading (for example, "Neural Confidence: 87.3%"). This score is specific to the trend signal the AI detected for that asset.
+  <Card title="Intelligence Lab — simulation badge" icon="flask">
+    Every what-if simulation returns a confidence badge (for example, `94% Confidence`) alongside the projected impact chart, reflecting how tightly the neural models agree on the projection.
   </Card>
 </CardGroup>
 

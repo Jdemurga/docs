@@ -1,0 +1,63 @@
+---
+title: "Market Hub: Global Trending Assets and Live Prices"
+description: "The Market Hub aggregates live prices, trending assets, and AI confidence scores across crypto, equities, and commodities in a single institutional terminal."
+---
+
+The Market Hub is your global data terminal inside Vexel Horizon. It combines a live price ticker with a neural-powered trending grid, so you can spot opportunities across crypto, equities, and commodities from one screen. The page is read-only and available to every visitor — no Sovereign Link session is required to browse.
+
+## Open the Market Hub
+
+Click **Market Hub** (🌐) in the left sidebar. The section loads the trending grid immediately and the main header ticker continues to stream updates in the background.
+
+## Live market ticker
+
+The top header of the terminal scrolls a real-time ticker with the most-watched instruments — BTC, ETH, AAPL, and PAXG by default. Each ticker item shows the current price, the 24-hour change, and an up or down arrow colored green for gains or red for losses. The ticker is powered by the `marketPulse` Socket.io event and refreshes on every Mesh pulse (approximately every 15 seconds).
+
+## Trending grid
+
+The Market Hub body is a responsive grid of **trending asset cards**, fetched from the platform each time you open the section:
+
+```bash
+GET /api/market/trending
+```
+
+Each card shows:
+
+| Field | Description |
+|---|---|
+| **Symbol** | The ticker (for example, `BTC`, `ETH`, `AAPL`) |
+| **Type** | The asset class — `CRYPTO`, `EQUITY`, `COMMODITY` |
+| **Price** | Current market price in USD |
+| **24h change** | Price movement with a colored arrow (▲ green for gains, ▼ red for losses) |
+| **Neural Confidence** | The AI confidence score for the trend signal, shown as a percentage |
+
+Cards are rendered in a CSS grid with a minimum column width of 250 pixels and auto-fill columns, so the layout adapts to your browser width.
+
+## AI Confidence on trending cards
+
+The **Neural Confidence** percentage on each card reflects how strongly Vexel's neural models agree on the trend signal for that asset. The value is derived from three parallel inputs:
+
+- News sentiment
+- Order flow depth and direction
+- Historical volatility
+
+Higher scores mean tighter agreement across models. See [AI Confidence](/concepts/ai-confidence) for details on how the score is calculated.
+
+<Tip>
+  Check the Neural Confidence score before acting on a trending signal. A reading above 90% indicates strong consensus across the neural models.
+</Tip>
+
+## What the Market Hub does not include
+
+The Market Hub is a discovery surface, not an execution surface. There is no Buy, Sell, or Invest button on the Market Hub itself — those actions live inside the Vexel Mobile app and are authorized through the Sovereign Guardian signing flow. Horizon's role is to surface intelligence; Vexel Mobile executes it.
+
+<Note>
+  If you want to act on a trending signal, open Vexel Mobile and initiate the trade from there. Any resulting signature request can still be authorized against your active browser Sovereign session.
+</Note>
+
+## Data freshness
+
+- **Ticker** — updates on every Mesh pulse (~15 seconds) via `marketPulse`
+- **Trending grid** — fetched each time you open the Market Hub section
+
+If the connection to Vexel Core drops, the terminal falls back to Fail-Safe Sandbox Mode. Cached data remains visible, but live updates pause until the Mesh connection is restored.

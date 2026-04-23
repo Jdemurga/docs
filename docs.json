@@ -39,26 +39,21 @@
                 ]
               },
               {
-                "group": "Trading",
+                "group": "Market Hub",
                 "pages": [
-                  "trading/market-hub",
-                  "trading/execute-swap",
-                  "trading/rwa-nexus"
+                  "market/overview"
                 ]
               },
               {
-                "group": "Strategies",
+                "group": "Intelligence Lab",
                 "pages": [
-                  "strategies/neural-strategist",
-                  "strategies/templates",
-                  "strategies/ai-generation"
+                  "intelligence/overview"
                 ]
               },
               {
-                "group": "Governance",
+                "group": "Community Board",
                 "pages": [
-                  "governance/overview",
-                  "governance/voting"
+                  "community/overview"
                 ]
               }
             ]

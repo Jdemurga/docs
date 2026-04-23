@@ -1,0 +1,84 @@
+---
+title: "Intelligence Lab: Run What-If Simulations"
+description: "The Intelligence Lab runs macroeconomic what-if simulations against your Sovereign portfolio, showing projected impact and human-readable AI reasoning."
+---
+
+The Intelligence Lab is Vexel Horizon's simulation environment — a Pro feature that lets you model the impact of macroeconomic events on your Sovereign portfolio before they happen. Pick a scenario, and the Mesh runs your current holdings through the selected event, returning a projected impact chart alongside a plain-language AI analysis. The Lab replaces the earlier node-based Neural Strategist with a focused, scenario-driven workflow.
+
+## Accessing the Intelligence Lab
+
+Click **Intelligence Lab** (💡) in the left sidebar.
+
+<Warning>
+  The Intelligence Lab is a protected Pro section. If you do not have an active Sovereign Link session, the terminal redirects you to the authentication screen automatically. See [Authenticate with Sovereign Link](/sovereign-link) to link your session.
+</Warning>
+
+## What the Lab shows you
+
+The Intelligence Lab is split into two panels.
+
+### AI Scenarios sidebar
+
+The left column lists the predefined scenarios you can simulate. Clicking a scenario marks it active and triggers the simulation against your current portfolio.
+
+| Scenario | Icon | Projected impact |
+|---|---|---|
+| Crypto Hyper-adoption | 🚀 | High Growth |
+| Systemic Credit Crunch | 📉 | High Volatility |
+| Inflation Spike | 💸 | RWA Resilience |
+
+A **Run Neural Audit** button at the bottom of the scenarios panel runs a custom neural audit across your portfolio without a preset macro scenario.
+
+### Simulation viewport
+
+The main column displays the simulation result for the currently selected scenario.
+
+- **Title** — the scenario name (for example, "Simulation Result: Crypto Hyper-adoption")
+- **Confidence badge** — the neural confidence percentage for the simulation (for example, `94% Confidence`)
+- **Chart** — a Chart.js plot showing the projected portfolio value against the baseline over the scenario horizon
+- **AI Analysis** — a human-readable explanation of the drivers behind the projection
+- **Sync Strategy to Mobile** — sends the recommended strategy to your linked Vexel Mobile app for biometric approval
+
+## Running a simulation
+
+<Steps>
+  <Step title="Open the Intelligence Lab">
+    Click **Intelligence Lab** in the sidebar. The Lab opens with the default scenario (**Crypto Hyper-adoption**) already active.
+  </Step>
+  <Step title="Select a scenario">
+    Click a card in the **AI Scenarios** sidebar to switch simulations. The selected card highlights, and the viewport updates with the new projection.
+  </Step>
+  <Step title="Review the chart">
+    Inspect the projected impact curve. The chart compares the scenario outcome to a baseline so you can see the delta against "no event" conditions.
+  </Step>
+  <Step title="Read the AI Analysis">
+    The analysis block below the chart explains the key drivers. For example, in a Crypto Hyper-adoption scenario the AI may suggest increasing RWA allocation to hedge correlation risk.
+  </Step>
+  <Step title="Sync the recommendation (optional)">
+    Click **Sync Strategy to Mobile** to push the AI's suggested rebalance to Vexel Mobile. Approve or reject the recommendation from the app using your biometric signature — the simulation alone does not move capital.
+  </Step>
+</Steps>
+
+## Neural Audit
+
+The **Run Neural Audit** button triggers a full audit of your portfolio without a macro scenario attached. Use it when you want the AI to evaluate correlation, drawdown exposure, and allocation drift across your full holdings rather than against a single macro event.
+
+<Info>
+  Simulation results are advisory. The Intelligence Lab does not execute trades or rebalances automatically — every recommended action has to be approved from Vexel Mobile. Horizon is read-heavy by design.
+</Info>
+
+## Interpreting simulation confidence
+
+The confidence badge on each simulation follows the same conventions as the rest of Vexel Horizon:
+
+| Score range | Interpretation |
+|---|---|
+| 95% and above | Very high confidence — strong consensus across neural models |
+| 80% – 94% | Moderate confidence — models broadly agree |
+| Below 80% | Lower certainty — treat as directional, not prescriptive |
+
+See [AI Confidence](/concepts/ai-confidence) for the full score methodology.
+
+<Tip>
+  Run the same scenario against multiple portfolios by switching the active vault in Vexel Mobile before syncing the recommended strategy. The Lab always simulates against your currently selected Sovereign portfolio.
+</Tip>
