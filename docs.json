@@ -47,7 +47,11 @@
               {
                 "group": "Intelligence Lab",
                 "pages": [
-                  "intelligence/overview"
+                  "intelligence/overview",
+                  "intelligence/brain-engine",
+                  "intelligence/forecast",
+                  "intelligence/guardians",
+                  "intelligence/neural-mesh"
                 ]
               },
               {

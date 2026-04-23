@@ -1,0 +1,149 @@
+---
+title: "Forecast and sentiment"
+description: "How Vexel-Brain blends sentiment, technicals, fundamentals, macro data, and the neural mesh into a single forecast score."
+---
+
+The forecast pipeline is the core recommendation engine behind every AI proposal you see in Vexel Horizon. Brain takes technical, fundamental, sentiment, and macro inputs, blends them with the collective bias of the neural mesh, and returns a directional call with a confidence score and a human-readable narrative.
+
+## Sentiment analysis
+
+Sentiment is produced by the FinBERT pipeline (`ProsusAI/finbert`) loaded through HuggingFace `transformers`.
+
+### `POST /analyze`
+
+Analyzes a single headline.
+
+```json
+{
+  "headline": "Crypto market rallies after Fed decision"
+}
+```
+
+Response:
+
+```json
+{
+  "headline": "Crypto market rallies after Fed decision",
+  "sentiment": "Positive",
+  "score": 0.99
+}
+```
+
+### `POST /analyze-batch`
+
+Analyzes a list of headlines and returns an aggregated sentiment plus the supporting evidence.
+
+```json
+{
+  "headlines": [
+    "Bitcoin surges past $70k",
+    "Inflation fears grow",
+    "Gold hits new ATH"
+  ],
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "sentiment": "Positive",
+  "score": 0.75,
+  "evidence": [
+    {"headline": "Bitcoin surges past $70k", "sentiment": "Positive", "score": 0.98},
+    {"headline": "Gold hits new ATH", "sentiment": "Positive", "score": 0.95}
+  ]
+}
+```
+
+## Forecast endpoint
+
+`POST /forecast` produces a directional call for a single asset.
+
+### Inputs
+
+- `symbol` — ticker for the asset being evaluated.
+- `prices`, `volumes` — historical series used to compute trend and volume deltas.
+- `volatility` — caller-supplied volatility estimate.
+- `sentiment_score`, `sentiment_label` — normalized sentiment inputs, typically derived from `/analyze-batch`.
+- `pe_ratio` — fundamental adjustment (set `0` for assets without equity fundamentals).
+- `inflation_rate`, `interest_rate` — macro adjustments.
+- `headlines` — context surfaced in the final narrative summary.
+- `lang` — `en` or `es` to localize the generated summary.
+
+### Scoring pipeline
+
+<Steps>
+  <Step title="Technicals">
+    Trend and volume deltas are derived from the `prices` and `volumes` arrays and normalized to `[-1, 1]`.
+  </Step>
+  <Step title="Fundamentals">
+    `pe_ratio` adjusts the score when the caller supplies a non-zero value, penalizing overvalued equities.
+  </Step>
+  <Step title="Macro">
+    Inflation and interest-rate inputs bias the score toward or away from risk assets.
+  </Step>
+  <Step title="Collective bias">
+    The P2P mesh contributes a `collective_bias` that reflects the weighted intelligence of peer Brain nodes.
+  </Step>
+  <Step title="RWA synergy">
+    `adaptive_optimizer.calculate_rwa_synergy` evaluates the hedge value of real-world assets against the scored position.
+  </Step>
+  <Step title="Final score">
+    Every dimension is combined using the currently optimized weights to produce the `final_score` and prediction label.
+  </Step>
+</Steps>
+
+### Response
+
+```json
+{
+  "symbol": "BTC",
+  "prediction": "Buy",
+  "confidence": 0.85,
+  "summary": "TECHNICAL OBSERVATION: stable volatility detected in BTC...",
+  "risk_level": "Medium",
+  "risk_tags": [],
+  "trend_pct": 8.33,
+  "sentiment_label": "Positive",
+  "xai_weights": { "macro": 0.4, "on_chain": 0.3, "sentiment": 0.2, "technical": 0.1 },
+  "neural_mesh": {
+    "active_nodes": 3,
+    "collective_bias": 0.62,
+    "mesh_health": "Optimal"
+  },
+  "rwa_synergy": {
+    "hedge_value": 0.72,
+    "uncorrelated_alpha": "Stable"
+  }
+}
+```
+
+The `xai_weights` object explains how each dimension contributed to the final score — Horizon uses this data to render the confidence breakdown on each AI proposal.
+
+## Adaptive weighting
+
+`POST /optimize` feeds historical trade outcomes back into the adaptive engine so that dimensions with higher hit rates gain more influence.
+
+```json
+{
+  "results": [
+    {"dimension": "macro", "success": true},
+    {"dimension": "on_chain", "success": false}
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "status": "optimized",
+  "weights": { "macro": 0.42, "on_chain": 0.28, "sentiment": 0.2, "technical": 0.1 }
+}
+```
+
+<Info>
+  The optimizer is stateless per request. Horizon sends a window of trade results each time weights need to be refreshed.
+</Info>

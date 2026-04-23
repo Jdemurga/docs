@@ -1,0 +1,92 @@
+---
+title: "Vexel-Brain engine"
+description: "Vexel-Brain is the stateless Python microservice that powers every AI proposal, simulation, and neural pulse surfaced in Vexel Horizon."
+---
+
+Vexel-Brain is the intelligence engine behind Vexel Horizon. It is a stateless Python microservice built on FastAPI that handles every heavy-compute task — sentiment analysis, portfolio forecasting, stress testing, and strategy orchestration — and returns actionable proposals to the terminal.
+
+## How Brain fits into the ecosystem
+
+Vexel-Brain never stores user state. Vexel-Core provides the `NarrativePortfolio` payload on every request, Brain runs its models, and the response is handed back to Horizon or routed to Vexel Mobile for biometric approval.
+
+<CardGroup cols={3}>
+  <Card title="Stateless" icon="server">
+    No user sessions, no database. Brain receives a payload, processes it, and returns a proposal.
+  </Card>
+  <Card title="Signed requests" icon="shield-halved">
+    Every write endpoint requires an HMAC-SHA256 signature with a one-minute timestamp window.
+  </Card>
+  <Card title="P2P mesh" icon="network-wired">
+    Brain instances gossip anonymized intelligence vectors over Redis Pub/Sub to form a collective bias.
+  </Card>
+</CardGroup>
+
+## Core components
+
+Vexel-Brain is a modular monolith. Each module owns a single analytical concern and is orchestrated by the FastAPI entry point.
+
+| Module | Responsibility |
+|---|---|
+| `main.py` | API gateway. Exposes the REST endpoints and boots background tasks. |
+| `adaptive_engine.py` | Tunes dimension weights (macro, on-chain, sentiment, technical) from trade feedback and computes RWA synergy. |
+| `cluster_manager.py` | Redis heartbeat registry of active Brain nodes and their specializations. |
+| `consensus.py` | Reconciles a local sentiment with peer intelligence into a "system truth" and confidence level. |
+| `p2p_mesh.py` | Publishes and subscribes to the `vexel:p2p:neural_mesh` gossip channel. |
+| `strategy_canvas_engine.py` | Interprets DAG-based automation strategies (threshold → swap → notify). |
+| `voice_processor.py` | Lightweight NLP router that turns voice transcripts into structured intents. |
+
+## Technology stack
+
+- **Runtime** — Python 3.8+, FastAPI, Uvicorn, Pydantic v2.
+- **NLP** — HuggingFace `transformers` with `ProsusAI/finbert` for financial sentiment.
+- **Infrastructure** — Redis for Pub/Sub (`aioredis`) and peer discovery.
+- **Security** — `hmac` + `hashlib` for signature verification, `python-dotenv` for configuration.
+
+## Request lifecycle
+
+<Steps>
+  <Step title="Horizon or Core calls a Brain endpoint">
+    The caller attaches `X-Vexel-Signature` and `X-Vexel-Timestamp` headers alongside the JSON payload.
+  </Step>
+  <Step title="Signature verification">
+    Brain rebuilds the signed string (minified JSON + timestamp), recomputes the HMAC-SHA256, and rejects the request with `403 Forbidden` if it does not match or if the timestamp is older than one minute.
+  </Step>
+  <Step title="Engine execution">
+    The matching module (forecast, stress test, guardrail, canvas) runs its logic, optionally blending in the P2P collective bias.
+  </Step>
+  <Step title="Proposal returned">
+    Brain responds with a structured JSON proposal. Actions that move capital are never executed by Brain itself — they are forwarded through Core to Vexel Mobile for Sovereign signing.
+  </Step>
+</Steps>
+
+## Environment configuration
+
+A Brain node reads the following variables from `.env`:
+
+```ini
+NODE_ID="vexel-brain-alpha"
+REDIS_HOST="localhost"
+REDIS_PORT="6379"
+SHARED_SECRET="replace-with-a-strong-secret"
+MODEL_CACHE_DIR="./model_cache"
+SPECIALIZATION="General"
+```
+
+<Warning>
+  `SHARED_SECRET` must be a strong, production-grade value. Horizon, Core, and Brain all sign requests with the same secret, so rotating it requires coordinated deployment across every service.
+</Warning>
+
+## Running Brain locally
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install fastapi uvicorn pydantic python-dotenv transformers redis
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Once running, the interactive OpenAPI UI is available at `http://localhost:8000/docs`.
+
+<Tip>
+  For production throughput, install `torch` with CUDA support and run Brain on a GPU-enabled host. FinBERT inference dominates latency on the `/analyze` and `/forecast` endpoints.
+</Tip>
