@@ -31,6 +31,12 @@
                 ]
               },
               {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/websocket-events"
+                ]
+              },
+              {
                 "group": "Dashboard",
                 "pages": [
                   "dashboard/overview",
