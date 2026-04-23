@@ -59,6 +59,18 @@ Vexel-Brain is a modular monolith. Each module owns a single analytical concern 
   </Step>
 </Steps>
 
+## Autonomous background tasks
+
+When Brain starts, `startup_event` spawns asynchronous loops that keep the mesh healthy without blocking the API.
+
+| Task | Interval | Purpose |
+|---|---|---|
+| `sovereign_watchdog` | 30 s | Evaluates systemic risk and writes a heartbeat to `vexel:watchdog:heartbeat:{NODE_ID}` in Redis. |
+| `neural_mesh_gossip` | 60 s | Publishes the local intelligence vector to `vexel:p2p:neural_mesh` and ingests peer updates via Pub/Sub. |
+| `cluster_engine.heartbeat` | 5 s | Announces the node on `vexel:cluster:heartbeat` so peers can discover it. |
+
+All three tasks are resilient to Redis disconnects — the loop retries with exponential backoff instead of crashing the process.
+
 ## Environment configuration
 
 A Brain node reads the following variables from `.env`:
@@ -129,3 +141,16 @@ Point both images at a reachable Redis instance (`REDIS_HOST`, `REDIS_PORT`) and
 | `GET`  | `/bot/status` | Trading bot execution mode. | [Market intelligence](/intelligence/market-intelligence) |
 
 Every `POST` endpoint (plus the governance and discovery `GET` endpoints) is protected by the HMAC-SHA256 signature guard described above.
+
+## Multilingual responses
+
+Brain generates narratives and guidance in either English (`en`) or Spanish (`es`). Endpoints that produce human-readable output accept a `lang` field on the request body and localize the response accordingly:
+
+- `/forecast` and `/simulate` — directional narratives and reasoning.
+- `/guardrails/scan` and `/guardian/sanitize` — risk warnings and recommendations.
+- `/stress-test` and `/report/summary` — scenario impact and weekly recaps.
+- `/analyze-docs` — legal risk alerts.
+- `/orchestrate` — portfolio rebalance narratives.
+- `/sentiment/on-chain` — whale and flow commentary.
+
+When `lang` is omitted or set to an unsupported value, Brain defaults to English.
