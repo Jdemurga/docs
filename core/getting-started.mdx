@@ -7,7 +7,7 @@ Vexel Core is a NestJS service. To run it locally you need Node.js, PostgreSQL, 
 
 ## Prerequisites
 
-- **Node.js** 18 or later
+- **Node.js** 18 or later (Docker images use Node `20-alpine`)
 - **npm** for dependency management
 - **PostgreSQL** with the TimescaleDB extension for price history
 - **Redis** for the microservice mesh and Socket.io adapter
@@ -117,3 +117,14 @@ A healthy response confirms the service booted and can accept requests. From the
 <Tip>
   For a fully-featured local environment, bring up PostgreSQL (with TimescaleDB), Redis, and Vexel Brain alongside Core using Docker Compose. Core's `Dockerfile` and `Dockerfile.prod` are included in the repository for containerized deployments.
 </Tip>
+
+## Run with Docker
+
+Vexel Core ships with a multi-stage `Dockerfile` based on `node:20-alpine`. To build and run the production image:
+
+```bash
+docker build -t vexel-core:latest .
+docker run -p 3000:3000 --env-file .env vexel-core:latest
+```
+
+The image exposes port `3000` and runs `node dist/main` as its entrypoint. Use `Dockerfile.prod` for deployments that require additional hardening.
