@@ -54,13 +54,13 @@ Every subscriber updates its peer registry, and the `P2PMesh.collective_bias()` 
     The caller submits a `local_sentiment` score together with a context label.
   </Step>
   <Step title="Compare against peers">
-    The engine retrieves the latest peer intelligence vectors from the mesh cache.
+    The engine retrieves the latest peer intelligence vectors from the mesh cache via `p2p_engine.get_known_intelligence()`.
   </Step>
-  <Step title="Weight by confidence">
-    Peers with higher confidence receive more weight in the aggregate.
+  <Step title="Average the signal">
+    The engine averages the local sentiment with every peer's reported sentiment to produce a `system_truth` value. If no peers are available, the node operates in **Sovereign Mode** and falls back to its own sentiment with full confidence.
   </Step>
-  <Step title="Output system truth">
-    The engine returns a `system_truth` value plus a `confidence` score that represents how strongly peers agree.
+  <Step title="Score the agreement">
+    Confidence is computed as `1 / (1 + |system_truth - local_sentiment|)`. The closer the peer consensus lands to the local view, the higher the confidence score.
   </Step>
 </Steps>
 

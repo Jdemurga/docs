@@ -81,15 +81,24 @@ SPECIALIZATION="General"
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install fastapi uvicorn pydantic python-dotenv transformers redis
+pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Once running, the interactive OpenAPI UI is available at `http://localhost:8000/docs`.
+`requirements.txt` pins FastAPI, Uvicorn, Pydantic, `python-dotenv`, HuggingFace `transformers`, `redis`, `numpy`, and a CPU build of `torch` (for FinBERT). Once the server is running, the interactive OpenAPI UI is available at `http://localhost:8000/docs`.
 
 <Tip>
-  For production throughput, install `torch` with CUDA support and run Brain on a GPU-enabled host. FinBERT inference dominates latency on the `/analyze` and `/forecast` endpoints.
+  For production throughput, replace the CPU-pinned `torch` wheel with a CUDA build and run Brain on a GPU-enabled host. FinBERT inference dominates latency on the `/analyze` and `/forecast` endpoints.
 </Tip>
+
+## Containerized deployments
+
+The repository ships two Dockerfiles — both built on `python:3.11-slim` and installing `requirements.txt`:
+
+- `Dockerfile` — single-process image that runs `uvicorn main:app --host 0.0.0.0 --port 8000`.
+- `Dockerfile.brain.prod` — production image that runs Uvicorn with `--workers 4` for higher throughput.
+
+Point both images at a reachable Redis instance (`REDIS_HOST`, `REDIS_PORT`) and mount a persistent volume at `MODEL_CACHE_DIR` so FinBERT weights are cached between restarts.
 
 ## Endpoint map
 
