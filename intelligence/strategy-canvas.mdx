@@ -1,0 +1,86 @@
+---
+title: "Strategy Canvas"
+description: "Design DAG-based automation flows and let Vexel-Brain route pulses through threshold, swap, and notify nodes."
+---
+
+The Strategy Canvas is Vexel-Brain's DAG interpreter. It takes a JSON graph of trigger and action nodes and executes the paths that meet the configured conditions. Horizon uses it to let Sovereigns wire up automation flows without writing code.
+
+## Node types
+
+| Node type | Role | Example |
+|---|---|---|
+| `sentiment` | Trigger. Reads the current sentiment score from live feeds. | "When sentiment above 0.7…" |
+| `yield` | Trigger. Reads the current yield metric. | "When 30d yield above 4.5%…" |
+| `threshold` | Gate. Forwards the pulse only if the input value passes a threshold. | Default threshold `0.7`. |
+| `swap` | Action. Emits an `AUTO_SWAP` directive. | Auto-rebalance into PAXG. |
+| `notify` | Action. Emits a `GUARDIAN_NOTIFY` alert. | Send push to Vexel Mobile. |
+
+Triggers are identified by the engine on ingestion; every other node is evaluated recursively as the pulse propagates through the connections.
+
+## Endpoint
+
+### `POST /canvas/simulate`
+
+Parses a graph and runs it against a mocked context (sentiment `0.85`, yield `0.045`, risk `0.12`). Use it to validate a canvas before deploying it live.
+
+Request:
+
+```json
+{
+  "graph": "{\"nodes\":[{\"id\":\"n1\",\"type\":\"sentiment\"},{\"id\":\"n2\",\"type\":\"threshold\"},{\"id\":\"n3\",\"type\":\"swap\"}],\"connections\":[{\"from\":\"n1\",\"to\":\"n2\"},{\"from\":\"n2\",\"to\":\"n3\"}]}"
+}
+```
+
+Response:
+
+```json
+{
+  "status": "Success",
+  "paths_triggered": 1,
+  "actions": [
+    {
+      "node_id": "n3",
+      "action": "AUTO_SWAP",
+      "details": "Strategy Canvas automation: High Sentiment detected."
+    }
+  ]
+}
+```
+
+## Graph schema
+
+```json
+{
+  "nodes": [
+    { "id": "string", "type": "sentiment | yield | threshold | swap | notify" }
+  ],
+  "connections": [
+    { "from": "node_id", "to": "node_id" }
+  ]
+}
+```
+
+<Info>
+  `graph` is passed as a stringified JSON blob inside the request body. This keeps the payload compatible with the signature verifier that normalises the JSON before hashing.
+</Info>
+
+## Execution semantics
+
+<Steps>
+  <Step title="Identify triggers">
+    The engine scans the graph for `sentiment` and `yield` nodes and uses them as entry points.
+  </Step>
+  <Step title="Read context value">
+    Each trigger reads its value from the context payload passed by Horizon. In simulation mode the context is fixed.
+  </Step>
+  <Step title="Propagate the pulse">
+    The pulse is forwarded to every node connected to the trigger. `threshold` nodes gate the pulse, only forwarding when the value exceeds the configured threshold (default `0.7`).
+  </Step>
+  <Step title="Emit actions">
+    `swap` and `notify` nodes append their action to the execution log. The final response surfaces them as `paths_triggered` and `actions`.
+  </Step>
+</Steps>
+
+<Warning>
+  Canvas actions are directives, not executions. `AUTO_SWAP` pulses are forwarded to Vexel Mobile for biometric signing. `GUARDIAN_NOTIFY` pulses route to the Guardian notification pipeline.
+</Warning>

@@ -51,7 +51,11 @@
                   "intelligence/brain-engine",
                   "intelligence/forecast",
                   "intelligence/guardians",
-                  "intelligence/neural-mesh"
+                  "intelligence/neural-mesh",
+                  "intelligence/voice-commands",
+                  "intelligence/strategy-canvas",
+                  "intelligence/simulation-lab",
+                  "intelligence/market-intelligence"
                 ]
               },
               {

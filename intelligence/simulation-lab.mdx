@@ -1,0 +1,100 @@
+---
+title: "Simulation Lab"
+description: "Manual 'what-if' simulations that combine trend, sentiment, and volume hypotheticals into a confidence-weighted prediction."
+---
+
+The Simulation Lab powers the manual what-if workflow in Vexel Horizon. Sovereigns type a scenario (or feed hypothetical values directly) and Brain returns a confidence-weighted prediction with the same narrative engine used for live forecasts.
+
+## Request flow
+
+Two endpoints cooperate to deliver a simulation:
+
+- `POST /simulate/interpret` — turns free-form text into structured parameters. See [Voice commands](/intelligence/voice-commands#scenario-interpreter).
+- `POST /simulate` — runs the scoring pipeline with the structured parameters.
+
+## `POST /simulate`
+
+Inputs:
+
+- `symbol` — the asset under analysis.
+- `hypothetical_trend_pct` — expected price change in percent (for example, `-10` for a 10% drop).
+- `hypothetical_sentiment` — expected sentiment in the `[0, 1]` range (`0.5` is neutral).
+- `hypothetical_volume_impact` — expected volume impact in the `[-1, 1]` range.
+- `lang` — `en` or `es` for the generated narrative.
+
+Request:
+
+```json
+{
+  "symbol": "BTC",
+  "hypothetical_trend_pct": -10.0,
+  "hypothetical_sentiment": 0.2,
+  "hypothetical_volume_impact": -0.5,
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "symbol": "BTC",
+  "simulated_prediction": "Sell",
+  "confidence": 0.6,
+  "logic": "TECHNICAL OBSERVATION: stable volatility detected in BTC.\n\nRECOMMENDATION: SELL. Distribution pressure and deteriorating sentiment suggest an imminent correction.",
+  "parameters": {
+    "trend": -10.0,
+    "sentiment": 0.2,
+    "volume": -0.5
+  }
+}
+```
+
+## Scoring pipeline
+
+<Steps>
+  <Step title="Trend impact">
+    `hypothetical_trend_pct / 100` is applied directly to a 0.5 baseline score.
+  </Step>
+  <Step title="Sentiment impact">
+    `(hypothetical_sentiment - 0.5) * 0.4` biases the score between `-0.2` and `0.2`.
+  </Step>
+  <Step title="Volume impact">
+    `hypothetical_volume_impact * 0.1` adds up to `±0.1` of additional drift.
+  </Step>
+  <Step title="Prediction">
+    The final score is clamped to `[0, 1]`. Verdict thresholds: `>0.8` Strong Buy, `>0.6` Buy, `<0.2` Strong Sell, `<0.4` Sell, otherwise Hold.
+  </Step>
+  <Step title="Narrative">
+    `build_potent_summary` composes a recommendation using the same template set as the live forecast endpoint — localized in English or Spanish.
+  </Step>
+</Steps>
+
+## Example: chaining interpret and simulate
+
+<CodeGroup>
+
+```bash curl
+# 1. Interpret a voice scenario
+curl -X POST http://localhost:8000/simulate/interpret \
+  -H "X-Vexel-Signature: $SIG" \
+  -H "X-Vexel-Timestamp: $TS" \
+  -d '{"command": "What if there is a crypto crash?"}'
+
+# 2. Forward the extracted parameters to /simulate
+curl -X POST http://localhost:8000/simulate \
+  -H "X-Vexel-Signature: $SIG" \
+  -H "X-Vexel-Timestamp: $TS" \
+  -d '{
+    "symbol": "BTC",
+    "hypothetical_trend_pct": -15.0,
+    "hypothetical_sentiment": 0.1,
+    "hypothetical_volume_impact": 0.0
+  }'
+```
+
+</CodeGroup>
+
+<Info>
+  The Simulation Lab is stateless and does not touch the live neural mesh. Use it for pre-flight analysis before syncing a strategy to Vexel Mobile.
+</Info>
