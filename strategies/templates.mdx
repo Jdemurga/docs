@@ -1,0 +1,91 @@
+---
+title: "Neural Strategy Templates"
+description: "Start with pre-built Smart Stop-Loss and Autonomous DCA templates in Vexel Horizon's Neural Strategist to automate risk management and dollar-cost averaging."
+---
+
+Neural Strategy Templates are pre-built strategy configurations you can load onto the canvas with a single click. Instead of placing and sequencing blocks manually, you start from a working node flow and customise it to match your requirements. Vexel Horizon ships with two built-in templates: **Smart Stop-Loss** and **Autonomous DCA**.
+
+## Available templates
+
+<CardGroup cols={2}>
+  <Card title="Smart Stop-Loss" icon="shield">
+    Monitors market sentiment and triggers a guardian alert notification when sentiment turns very negative. The alert surfaces on Vexel Mobile, where you approve or reject the protective action.
+  </Card>
+  <Card title="Autonomous DCA" icon="chart-line">
+    Watches your yield performance and automatically triggers a dollar-cost averaging swap when your returns drop below target — without requiring manual approval for each cycle.
+  </Card>
+</CardGroup>
+
+## Template node flows
+
+Each template loads a specific sequence of Neural Blocks. The order of blocks on the canvas defines the execution logic.
+
+<Tabs>
+  <Tab title="Smart Stop-Loss">
+    **Blocks loaded:** AI Sentiment → Threshold Check → Guardian Alert
+
+    | Position | Block | Role |
+    |---|---|---|
+    | 1 | AI Sentiment | Reads global news tone as the trigger |
+    | 2 | Threshold Check | Evaluates whether sentiment has crossed a negative threshold |
+    | 3 | Guardian Alert | Sends a notification to Vexel Mobile for your approval |
+
+    The strategy does not execute a swap automatically. Instead, the Guardian Alert block notifies you on Vexel Mobile, where you decide whether to approve the protective action.
+  </Tab>
+  <Tab title="Autonomous DCA">
+    **Blocks loaded:** Yield Scan → Auto-Swap
+
+    | Position | Block | Role |
+    |---|---|---|
+    | 1 | Yield Scan | Monitors returns and triggers when yield falls below target |
+    | 2 | Auto-Swap | Executes the dollar-cost averaging swap automatically |
+
+    This template runs without a manual approval step. When your yield drops below the configured threshold, the Auto-Swap fires immediately on the Vexel Mesh.
+  </Tab>
+</Tabs>
+
+## Using a template
+
+<Steps>
+  <Step title="Open the Neural Strategist">
+    Click **Strategist** in the sidebar. The canvas workspace opens. Sovereign Link authentication is required — Vexel Horizon redirects you to authenticate if you are not already signed in.
+  </Step>
+  <Step title="Select a template">
+    In the **Neural Templates** section of the left sidebar, click the template you want to load:
+    - **🛡️ Smart Stop-Loss** for sentiment-based guardian alerts
+    - **📈 Autonomous DCA** for yield-triggered dollar-cost averaging
+  </Step>
+  <Step title="Review the loaded node flow">
+    The canvas clears any existing nodes and places the template's pre-configured block sequence. Inspect the nodes and their connections to confirm the flow matches your intent.
+  </Step>
+  <Step title="Customise the flow (optional)">
+    Add additional Neural Blocks from the left sidebar by dragging them onto the canvas, or right-click any existing node to remove it. You can extend a template without restriction.
+  </Step>
+  <Step title="Deploy to the Mesh">
+    Click **Deploy to Mesh** to activate the strategy. Vexel Horizon runs a neural simulation of your graph and presents a verification report. Deployment requires an active Sovereign Link session — the network uses your biometric signature to authorise capital movements.
+  </Step>
+</Steps>
+
+<Tip>
+  Templates are starting points, not fixed configurations. Load a template, then drag in extra blocks to extend the logic — for example, add a **Threshold Check** before the **Auto-Swap** in the Autonomous DCA template to introduce a numeric guardrail.
+</Tip>
+
+<Note>
+  Loading a template replaces everything currently on the canvas. If you have unsaved work you want to keep, note down your node arrangement before clicking a template button.
+</Note>
+
+## What happens when you load a template
+
+When you click a template button, the canvas clears, the template's nodes are placed at predefined positions, and the connections between them are drawn automatically. The Sovereign Reasoning feed confirms the load with a status message such as:
+
+```
+Template 'Smart Stop-Loss' loaded. AI nodes deployed.
+```
+
+or
+
+```
+Template 'Autonomous DCA' loaded. Sequential flow ready.
+```
+
+You can then proceed to customise or deploy directly from that state.

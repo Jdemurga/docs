@@ -1,0 +1,125 @@
+---
+title: "Generate Strategies with AI Natural Language"
+description: "Type a plain-English trading instruction into the Vexel Horizon Neural Strategist and let the AI generate the matching node flow on your canvas automatically."
+---
+
+The Neural Strategist includes an AI generation input that translates plain-English trading instructions directly into canvas node flows. Instead of dragging and sequencing blocks manually, you describe what you want the strategy to do — and the system places the corresponding nodes for you in approximately 1.2 seconds.
+
+## Where to find the AI input
+
+The AI generation bar sits at the top of the canvas workspace, anchored to the centre of the screen. It is marked with a **✨** icon. You can type your instruction into the text field and submit it with the **GENERATE** button or by pressing **Enter**.
+
+## How it works
+
+<Steps>
+  <Step title="Type your intent in plain English">
+    Click the AI input bar at the top of the canvas and enter a plain-English description of your trading logic. For example:
+
+    ```text
+    Sell BTC if AI sentiment is very negative
+    ```
+  </Step>
+  <Step title="Submit the command">
+    Click **GENERATE** or press **Enter**. The Sovereign Reasoning feed immediately confirms receipt:
+
+    ```
+    [AI] Processing order: "sell BTC if AI sentiment is very negative"
+    ```
+  </Step>
+  <Step title="Wait for the node layout to appear">
+    After approximately 1.2 seconds, the AI clears the current canvas and places the generated nodes. The feed updates with:
+
+    ```
+    Strategy synthesized based on your intent.
+    ```
+
+    The input bar clears automatically.
+  </Step>
+  <Step title="Review the generated flow">
+    Inspect the nodes placed on the canvas. Add blocks from the left sidebar or right-click nodes to remove them if the layout needs adjustment.
+  </Step>
+  <Step title="Deploy to the Mesh">
+    Click **Deploy to Mesh** to activate the strategy on the decentralized network. Deployment requires an active Sovereign Link session.
+  </Step>
+</Steps>
+
+## Logic mapping
+
+The AI maps keywords in your command to specific node combinations. Understanding this mapping helps you write more precise instructions.
+
+<Tabs>
+  <Tab title="Buy / Swap commands">
+    Commands containing **"buy"** or **"swap"** generate:
+
+    | Block | Position |
+    |---|---|
+    | AI Sentiment | First |
+    | Auto-Swap | Second |
+
+    **Example commands:**
+    - `Buy ETH when market sentiment is positive`
+    - `Swap to gold when yield drops`
+    - `Buy BTC on positive sentiment`
+  </Tab>
+  <Tab title="Sell / Sentiment commands">
+    Commands containing **"sell"** or **"sentiment"** generate:
+
+    | Block | Position |
+    |---|---|
+    | AI Sentiment | First |
+    | Threshold Check | Second |
+    | Guardian Alert | Third |
+
+    **Example commands:**
+    - `Sell BTC if sentiment turns negative`
+    - `Sell BTC if AI sentiment is very negative`
+    - `Monitor sentiment and alert me`
+  </Tab>
+  <Tab title="Other commands">
+    Commands that contain neither of the above keywords generate:
+
+    | Block | Position |
+    |---|---|
+    | Yield Scan | First (default starting point) |
+
+    **Example commands:**
+    - `Protect my portfolio`
+    - `Watch for yield changes`
+    - `Monitor performance`
+  </Tab>
+</Tabs>
+
+<Note>
+  AI generation builds the visual layout on your canvas — it does not deploy or execute the strategy. Review the generated nodes, adjust the flow as needed, and then click **Deploy to Mesh** when you are ready to activate it.
+</Note>
+
+## Example commands to try
+
+```text
+Buy ETH when market sentiment is positive
+```
+
+```text
+Sell BTC if sentiment turns negative
+```
+
+```text
+Swap to gold when yield drops
+```
+
+## After generation
+
+Once the AI places nodes on the canvas, you are in full control of the resulting flow. You can:
+
+- Drag additional blocks from the **Neural Blocks** sidebar to extend the logic
+- Right-click any node to remove it
+- Click **Clear Canvas** to start over
+- Click **Deploy to Mesh** to activate the strategy (requires Sovereign Link)
+
+<Tip>
+  Click the **📖 VIEW GUIDE** button at the bottom of the Strategist sidebar to open the in-app Tutorial on strategy building. It walks through block placement and deployment step by step.
+</Tip>
+
+<Warning>
+  Generating a strategy from text replaces whatever is currently on the canvas. If you have an existing node layout you want to keep, note it down or deploy it before running a new AI generation command.
+</Warning>

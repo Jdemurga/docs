@@ -1,0 +1,94 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Vexel Horizon",
+  "theme": "luma",
+  "colors": {
+    "primary": "#00d2ff",
+    "dark": "#9d50bb"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/Jdemurga/vexel-horizon"
+    }
+  },
+  "navigation": {
+    "products": [
+      {
+        "product": "VEXEL_HORIZON",
+        "icon": "0",
+        "openapi": "api-reference/openapi.json",
+        "tabs": [
+          {
+            "tab": "Platform",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "introduction",
+                  "sovereign-link",
+                  "quickstart"
+                ]
+              },
+              {
+                "group": "Dashboard",
+                "pages": [
+                  "dashboard/overview",
+                  "dashboard/yield-velocity",
+                  "dashboard/ai-signals"
+                ]
+              },
+              {
+                "group": "Trading",
+                "pages": [
+                  "trading/market-hub",
+                  "trading/execute-swap",
+                  "trading/rwa-nexus"
+                ]
+              },
+              {
+                "group": "Strategies",
+                "pages": [
+                  "strategies/neural-strategist",
+                  "strategies/templates",
+                  "strategies/ai-generation"
+                ]
+              },
+              {
+                "group": "Governance",
+                "pages": [
+                  "governance/overview",
+                  "governance/voting"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Concepts",
+            "groups": [
+              {
+                "group": "Core Concepts",
+                "pages": [
+                  "concepts/the-mesh",
+                  "concepts/ai-confidence",
+                  "concepts/lattice-security",
+                  "concepts/sovereign-reasoning"
+                ]
+              },
+              {
+                "group": "FAQ",
+                "pages": [
+                  "faq/general",
+                  "faq/security"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "product": "VEXEL_MOBILE"
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+---
+title: "Lattice Security: Quantum-Resistant Protection"
+description: "Vexel's Lattice-based cryptography protects your Sovereign session and trade authorizations against both classical and future quantum computing attacks."
+---
+
+Every action you authorize in Vexel Horizon — from executing a swap to casting a governance vote — is protected by **Lattice-based cryptography**. Unlike the elliptic curve and RSA schemes that underpin most financial security today, lattice cryptography is built on mathematical problems that quantum computers cannot efficiently solve, making your authorizations durable against both current and future threats.
+
+## Why lattice cryptography matters
+
+Most financial platforms rely on cryptographic schemes whose security depends on problems — like factoring large integers — that sufficiently powerful quantum computers will eventually break. When that threshold is reached, signatures and session tokens protected by those schemes become vulnerable.
+
+Vexel's **Sovereign Guardian** protocol was designed from the outset around lattice-based cryptography. Because lattice problems remain hard even for quantum computers, your authorizations stay protected regardless of advances in quantum hardware.
+
+<Info>
+  You do not need to understand the mathematics of lattice cryptography to benefit from it. Vexel handles all cryptographic operations automatically. This page explains what is happening behind the scenes so you can understand the security guarantees you are receiving.
+</Info>
+
+## Where Lattice Security applies
+
+### Trade execution
+
+Every swap you execute through the Sovereign Guardian flow is lattice-signed before The Mesh processes it. The Mesh verifies the lattice proof before the trade executes — unsigned or improperly signed transactions are rejected at the network level.
+
+### Completed transaction feedback
+
+When a trade completes with lattice verification, the execution feedback panel in the Trading section updates to show:
+
+- A **blue highlighted** feedback panel border
+- The text **"Quantum Secured!"** followed by the AI's reasoning for the transaction
+- A **`LATTICE_VERIFIED`** badge confirming the cryptographic proof was accepted by The Mesh
+
+The panel clears automatically after 5 seconds, and a permanent record is written to your Sovereign Reasoning feed under the `LEDGER` prefix, including the audit ID.
+
+### Governance votes
+
+Votes authorized from Vexel Mobile go through the same Sovereign Guardian lattice-signing flow as trade executions. The Mesh verifies the signature before recording the vote as valid.
+
+## The Sovereign Guardian authorization flow
+
+<Steps>
+  <Step title="You initiate an action">
+    You submit a swap, vote, or other authorized action from the Vexel terminal. The system parks the payload and displays "Pending | Waiting for Mobile Sign."
+  </Step>
+  <Step title="Vexel Mobile receives the request">
+    A push notification or QR scan brings the pending action to Vexel Mobile. The action details — asset, amount, and session context — are displayed for your review.
+  </Step>
+  <Step title="Biometric signature creates a lattice proof">
+    Your biometric authentication on the mobile device is used to generate a lattice-based cryptographic proof tied to your Sovereign session. Your private key material never leaves the device.
+  </Step>
+  <Step title="The Mesh verifies and executes">
+    The proof is submitted to The Mesh. Mesh nodes verify the lattice signature against your session. On success, the action executes and the `action_completed` event is emitted to your terminal.
+  </Step>
+</Steps>
+
+<Note>
+  You never manage cryptographic keys manually. The Sovereign Link QR flow handles all key operations transparently through Vexel Mobile. There are no seed phrases or key files to safeguard on your end.
+</Note>
+
+<Warning>
+  If you receive a "Session revoked" notification, your Sovereign session has been invalidated from your mobile device. Vexel will automatically clear your session and reload. Re-authenticate via the Sovereign Link QR to restore access.
+</Warning>

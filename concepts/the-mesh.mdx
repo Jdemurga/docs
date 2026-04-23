@@ -1,0 +1,55 @@
+---
+title: "What Is The Mesh?"
+description: "The Mesh is Vexel's decentralized node network. It processes AI calculations, syncs governance state globally, and broadcasts market pulses every 15 seconds."
+---
+
+The Mesh is the foundation everything in Vexel Horizon runs on. Rather than relying on a central server that a single party could take offline, The Mesh is a network of distributed nodes that collectively process AI calculations, maintain data integrity, and broadcast synchronized market state to every connected terminal worldwide.
+
+## Three core functions
+
+<CardGroup cols={3}>
+  <Card title="Parallel Processing" icon="server">
+    AI calculations are split across Mesh nodes for ultra-fast, fault-tolerant execution. No single node is a bottleneck or point of failure.
+  </Card>
+  <Card title="Incorruptibility" icon="shield">
+    Data cannot be altered without consensus from the majority of the network. No individual actor — including Vexel — can tamper with recorded state.
+  </Card>
+  <Card title="Mesh Pulse" icon="signal">
+    Every 15 seconds, The Mesh emits a heartbeat that synchronizes all prices and governance states across every connected node worldwide.
+  </Card>
+</CardGroup>
+
+## How The Mesh affects your experience
+
+The Mesh Pulse is the mechanism behind Vexel's real-time updates. When a pulse is received, the `marketPulse` Socket.io event fires in your browser and immediately refreshes three values on your Dashboard:
+
+- **Portfolio value** — your total net worth recalculated against current market prices
+- **Yield Velocity** — your per-second capital growth rate, updated to the latest pulse data
+- **AI Confidence score** — the network-wide neural confidence level for the current market state
+
+Between pulses, Vexel interpolates your portfolio value locally so the display stays smooth rather than jumping every 15 seconds.
+
+## Status indicators
+
+### Mesh Latency indicator
+
+The top header of the terminal shows a live **Mesh Latency** reading (for example, "Mesh Latency: 14ms"). The indicator dot next to it reflects the pulse cycle:
+
+- **Green** — the indicator turns green for half a second immediately after a pulse is received
+- **Blue** — returns to blue as the terminal waits for the next pulse
+
+### Sovereign session indicator
+
+In the sidebar, your user area shows a small green dot next to your name when your session is connected to The Mesh. If that dot is absent, your Sovereign session is not active.
+
+<Note>
+  The sidebar session indicator and the header Mesh Latency indicator are independent signals. The session indicator reflects your authentication state; the header indicator reflects live Mesh connectivity.
+</Note>
+
+## Fail-Safe Sandbox Mode
+
+<Warning>
+  If The Mesh connection is lost, Vexel automatically enters **Fail-Safe Sandbox Mode**. In this state, historical data remains visible but live updates — including price changes, Yield Velocity, and AI Confidence — pause until the connection is restored. You will see a feed entry noting the connection loss.
+</Warning>
+
+When connectivity returns, the `marketPulse` stream resumes and all live values update immediately with the latest pulse data.

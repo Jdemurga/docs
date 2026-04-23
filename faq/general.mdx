@@ -1,0 +1,131 @@
+---
+title: "Vexel Horizon FAQ: Features, Trading, and Authentication"
+description: "Answers to common questions about Vexel Horizon features, authentication, trading, RWA investing, and getting the most out of your Sovereign session."
+---
+
+Vexel Horizon is a sovereign financial intelligence terminal — a browser-based interface where AI-driven trading, real-world asset tokenization, and decentralized governance converge. Whether you are exploring the platform as a guest or operating in full Sovereign Mode, this page answers the most common questions you will encounter along the way.
+
+<AccordionGroup>
+
+  <Accordion title="What is Vexel Horizon?">
+    Vexel Horizon is a sovereign financial intelligence terminal that combines AI-assisted trading, real-world asset (RWA) tokenization, and DAO governance into a single interface. It is part of the broader Vexel ecosystem, which includes **Vexel Mobile** (your biometric identity device) and **Vexel Core** (the backend API and market data layer).
+
+    The terminal is designed to give you institutional-grade market intelligence while keeping you in full control of every capital action through biometric authorization.
+  </Accordion>
+
+  <Accordion title="Do I need to create an account?">
+    No account creation is required to explore Vexel Horizon. You can access the **Dashboard** and **Market Hub** without authenticating — the terminal operates in **Collective Mode**, showing aggregated ecosystem data such as the Global Ecosystem Value and Collective Velocity.
+
+    To perform any write operation — executing trades, voting on governance proposals, building and deploying strategies in the Neural Strategist, or activating Risk Insurance — you must authenticate via **Sovereign Link** using the Vexel Mobile app.
+
+    <Tip>
+      Collective Mode is a great way to evaluate live market signals and AI confidence scores before committing to a Sovereign session.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="What is Sovereign Mode?">
+    Sovereign Mode is the authenticated state of Vexel Horizon. After you scan the Sovereign Link QR code with Vexel Mobile, the terminal switches from collective data to your personal financial view:
+
+    - The **Net Worth** card relabels to show your **personal vault value** (e.g., "Alice Vault Value") instead of the global ecosystem total.
+    - The **Yield Velocity** counter switches from "Collective Velocity" to **"Personal Velocity"**, reflecting your individual asset performance.
+    - The portfolio chart dataset label changes from **"Vexel Ecosystem Index"** to **"Personal Portfolio performance"**.
+    - The sidebar user area shows your name, email, and a live green pulse indicator confirming your session is active.
+
+    You can end your Sovereign session at any time by clicking **DISCONNECT SESSION** in the sidebar user area.
+  </Accordion>
+
+  <Accordion title="Which features require Sovereign Link authentication?">
+    The following sections are protected and redirect you to the Sovereign Link screen if you are not authenticated:
+
+    | Feature | Authentication required |
+    |---|---|
+    | Dashboard (Collective Mode) | No |
+    | Market Hub | No |
+    | RWA Nexus (browsing) | No |
+    | Trading (Sovereign Execution Engine) | Yes |
+    | DAO Governance voting | Yes |
+    | Neural Strategist (strategy build and deploy) | Yes |
+    | Risk Insurance activation | Yes |
+
+    <Note>
+      Even after authenticating, every individual write operation (trade, vote, strategy deployment) requires a fresh biometric signature from Vexel Mobile. Authentication establishes your session; your biometrics authorize each action.
+    </Note>
+  </Accordion>
+
+  <Accordion title="What is Yield Velocity?">
+    Yield Velocity is a per-second capital growth metric that shows how quickly your portfolio is generating value. Unlike a static APY figure, it is dynamic — calculated by the **Adaptive Engine** from three inputs:
+
+    1. The real-time performance of your individual assets
+    2. Network fees generated across The Mesh
+    3. Governance incentives accrued from your DAO participation
+
+    The value is displayed to four decimal places (e.g., `+$0.0240/sec`) and updates smoothly every **100 milliseconds** using linear interpolation between Mesh pulses. This keeps the counter visually fluid even between the 15-second data syncs from the network.
+
+    <Info>
+      In Collective Mode (unauthenticated), the Dashboard shows "Collective Velocity" — the aggregate yield rate across all active Sovereign nodes on The Mesh, not your personal rate.
+    </Info>
+  </Accordion>
+
+  <Accordion title="What is The Mesh?">
+    The Mesh is the decentralized infrastructure network that powers Vexel. Rather than a central server, it is a distributed network of nodes responsible for:
+
+    - **Parallel AI processing** — computations are split across nodes to be fast and fault-tolerant.
+    - **Governance state synchronization** — DAO proposal outcomes and vote counts are kept consistent across all participants.
+    - **Market pulse emission** — every **15 seconds**, The Mesh emits a heartbeat that synchronizes all asset prices and governance states worldwide.
+
+    Because The Mesh is distributed, no single actor can shut down Vexel or alter data without achieving network consensus.
+
+    For a full technical explanation, see the [concepts page on The Mesh](/concepts/the-mesh).
+  </Accordion>
+
+  <Accordion title="What assets can I trade on Vexel Horizon?">
+    The **Sovereign Execution Engine** (Trading section) currently supports swaps between the following assets:
+
+    - **Bitcoin (BTC)**
+    - **Ethereum (ETH)**
+    - **USD — Dollar (USD)**
+    - **Pax Gold — Physical Gold (PAXG)**
+
+    The **Market Hub** displays a broader view including **Apple Inc. (AAPL)** and other assets, each with a live price, 24-hour change, and AI Confidence score. Clicking "Trade" from the Market Hub navigates you to the execution engine.
+
+    <Note>
+      Trading requires Sovereign Link authentication. If you are in Collective Mode, selecting "Trade" will redirect you to the Sovereign Link screen.
+    </Note>
+  </Accordion>
+
+  <Accordion title="How does the AI Confidence score work?">
+    The AI Confidence score is a statistical probability generated by analyzing three data streams simultaneously across multiple neural networks:
+
+    1. **News sentiment** — the tone of recent global financial news related to the asset.
+    2. **Order volume** — current buy and sell pressure in the market.
+    3. **Historical volatility** — how the asset has behaved under similar conditions in the past.
+
+    A score above **95%** indicates a very strong consensus across all networks, meaning the prediction has minimal standard deviation and a high probability of fulfillment. Lower scores reflect greater uncertainty in the model's inputs.
+
+    <Warning>
+      The AI Confidence score is informational — it is not a guarantee of any particular outcome. Market conditions can shift rapidly. Always assess your own risk tolerance before executing any trade.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="What happens if my trade is flagged as a security risk?">
+    Before any swap is executed, the Sovereign Execution Engine runs an **AI Security Scan** that checks:
+
+    - Market liquidity (to avoid losses from insufficient order book volume)
+    - The security profile of the target smart contract
+    - The probability of price improvement in the near term
+
+    If the scan detects a problem, the trade is automatically aborted. The execution status changes to **"Aborted | Security Risk"** and the feedback panel shows a red warning with the specific risk details — for example, "DANGEROUS: Insufficient liquidity, Smart contract vulnerability."
+
+    No funds are moved when a trade is aborted. You can review the flagged reason and decide whether to retry under different conditions.
+  </Accordion>
+
+  <Accordion title="What languages does Vexel Horizon support?">
+    Vexel Horizon supports **English (EN)** and **Spanish (ES)**. You can switch between them at any time using the language toggle buttons located in:
+
+    - The **top-left corner of the sidebar**
+    - The **main header**, next to the "Connect Sovereign" button
+
+    Your language preference is saved locally and applies to all labeled UI elements, including navigation items, section headings, status messages, and the Sovereign Guide knowledge base.
+  </Accordion>
+
+</AccordionGroup>

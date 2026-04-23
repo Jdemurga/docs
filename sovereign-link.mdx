@@ -1,0 +1,59 @@
+---
+title: "Authenticate with Sovereign Link"
+description: "Sovereign Link connects your Vexel Mobile biometric identity to Vexel Horizon via a QR code scan, enabling trading, governance, and strategy deployment."
+---
+
+Sovereign Link is the QR-based authentication system that ties your Vexel Mobile biometric identity to a live browser session on Vexel Horizon. There are no passwords. Instead, the terminal generates a unique session ID, encodes it into a QR code, and waits for your mobile app to scan and sign it. Once the link is established, Vexel Horizon switches to Sovereign Mode and loads your personal vault data.
+
+## What Sovereign Link unlocks
+
+The following operations require an active Sovereign session. Attempting to access them without one redirects you to the authentication screen automatically:
+
+- **Trading** — executing asset swaps through the Sovereign Execution Engine
+- **Governance voting** — authorizing FOR or AGAINST votes on DAO proposals
+- **Neural strategy deployment** — sending strategies from the Neural Strategist canvas to the Vexel Mesh
+- **Risk insurance activation** — enabling autonomous portfolio protection
+
+<Info>
+  The Dashboard, Market Hub, and RWA Nexus are available in Collective Mode without authentication. You only need Sovereign Link when you want to act on the data rather than observe it.
+</Info>
+
+## How to authenticate
+
+<Steps>
+  <Step title="Open the Sovereign Link prompt">
+    Click the **Connect Sovereign** button in the top-right corner of the header. Alternatively, click **Sovereign Link** in the left sidebar navigation. Either action opens the Sovereign Guardian modal.
+  </Step>
+  <Step title="Receive your session QR code">
+    The terminal generates a QR code that encodes a unique session ID for your current browser tab. A session identifier is displayed beneath the QR code — for example, `[SESSIONID: 4f2c-9a11-b0e2-7634]`. This ID is cryptographically unique to your session.
+  </Step>
+  <Step title="Open Vexel Mobile">
+    On your phone, open the Vexel Mobile app and navigate to **Profile > Sovereign Link**.
+  </Step>
+  <Step title="Scan the QR code">
+    Use Vexel Mobile to scan the QR code displayed in your browser. The app reads the session ID and initiates the biometric authorization flow.
+  </Step>
+  <Step title="Session activates in the browser">
+    After a successful scan, the browser receives a confirmation over the live socket connection. The terminal dismisses the modal, switches to Sovereign Mode, and reloads the dashboard with your personal vault data — vault value, personal yield velocity, and your portfolio performance chart.
+  </Step>
+</Steps>
+
+## Session storage
+
+On successful authentication, Vexel Horizon stores your session credentials securely in your browser. The terminal reads these on every page load to determine whether to start in Collective Mode or Sovereign Mode. Your credentials are tied to the session ID established during the QR handshake and are never transmitted in plain text.
+
+<Warning>
+  Your JWT remains in the browser until you explicitly disconnect or clear local storage. Do not authenticate on shared or public devices unless you intend to disconnect before leaving.
+</Warning>
+
+## Disconnecting your session
+
+To end your Sovereign session, click **DISCONNECT SESSION** in the user area at the bottom of the left sidebar. This clears your session and reloads the terminal in Collective Mode.
+
+## Protected section redirects
+
+If you navigate directly to Trading, Governance, Neural Strategist (canvas), or Risk Insurance without an active session, the terminal automatically redirects you to the Sovereign Link authentication screen. Complete the QR scan described above and the terminal returns you to the section you requested.
+
+<Tip>
+  Keep the Sovereign Guardian modal open on your desktop and your Vexel Mobile app at the ready for the fastest authentication experience. The QR code is valid for your entire browser session.
+</Tip>

@@ -1,0 +1,107 @@
+{
+  "projectType": "saas",
+  "projectName": "Vexel Horizon",
+  "projectDescription": "A sovereign financial intelligence terminal that combines AI-driven trading, real-world asset tokenization, and decentralized governance in a single institutional-grade dashboard.",
+  "theme": "luma",
+  "primaryColor": "#00d2ff",
+  "lightColor": null,
+  "darkColor": "#9d50bb",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Platform",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "sovereign-link",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Dashboard",
+            "pages": [
+              "dashboard/overview",
+              "dashboard/yield-velocity",
+              "dashboard/ai-signals"
+            ]
+          },
+          {
+            "group": "Trading",
+            "pages": [
+              "trading/market-hub",
+              "trading/execute-swap",
+              "trading/rwa-nexus"
+            ]
+          },
+          {
+            "group": "Strategies",
+            "pages": [
+              "strategies/neural-strategist",
+              "strategies/templates",
+              "strategies/ai-generation"
+            ]
+          },
+          {
+            "group": "Governance",
+            "pages": [
+              "governance/overview",
+              "governance/voting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Concepts",
+        "groups": [
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/the-mesh",
+              "concepts/ai-confidence",
+              "concepts/lattice-security",
+              "concepts/sovereign-reasoning"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "faq/general",
+              "faq/security"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Sovereign Link — QR-based biometric authentication via Vexel Mobile",
+    "Yield Velocity — real-time per-second capital growth tracking",
+    "AI Proactive Signals — autonomous buy/sell recommendations with one-tap approval",
+    "RWA Nexus — tokenized real-world assets (gold, real estate, institutional debt) with audit reports",
+    "Neural Strategist — no-code visual canvas for building automated trading strategies",
+    "Sovereign DAO Governance — on-chain proposal voting with Neural Consensus analysis",
+    "Lattice Security — quantum-resistant cryptographic signing protocol",
+    "Dual-state Dashboard — Collective Mode (guest) and Sovereign Mode (authenticated)",
+    "Multi-language support — English and Spanish UI",
+    "Vexel AI Chat — voice and text command interface for market analysis and trade execution"
+  ],
+  "publicApiSurface": [
+    "GET /api/market/public/ecosystem — global ecosystem stats (unauthenticated)",
+    "GET /api/market/public/yield/status — public yield velocity status",
+    "GET /api/market/public/index-history — public index price history",
+    "GET /api/market/public/proposals — active DAO governance proposals",
+    "GET /api/market/public/rwa — tokenized real-world asset listings",
+    "GET /api/market/trending — trending asset signals with AI confidence scores",
+    "GET /api/market/dashboard — authenticated personal portfolio dashboard",
+    "GET /api/market/yield/personal — authenticated personal yield velocity",
+    "GET /api/market/history — authenticated asset price history",
+    "POST /api/market/execute — submit a sovereign swap/trade order",
+    "Socket.io: registerSession — register a browser session for Sovereign Link",
+    "Socket.io: sessionLinked — event fired when mobile QR scan completes auth",
+    "Socket.io: marketPulse — real-time portfolio and confidence updates from the Mesh",
+    "Socket.io: action_completed — trade execution confirmation with audit ID",
+    "Socket.io: session_revoked — forced logout event from mobile"
+  ]
+}

@@ -1,0 +1,89 @@
+---
+title: "Neural Strategist: Visual No-Code Trading Automation"
+description: "Build automated trading strategies in Vexel Horizon by dragging logic blocks onto a visual canvas — no code required. Deploy your strategy to the Vexel Mesh."
+---
+
+The Neural Strategist — also called "The Brain" — is a visual, no-code programming environment built into Vexel Horizon for automating financial decisions. Instead of writing code, you drag logic blocks onto a canvas and connect them to define the conditions and actions that govern your strategy. The result is an autonomous workflow that runs on the decentralized Vexel Mesh.
+
+## Accessing the Neural Strategist
+
+Click **Strategist** in the left sidebar to open the Neural Strategist.
+
+<Warning>
+  The Strategist is a protected section. You must have an active **Sovereign Link** session before you can access it. If you are not authenticated, Vexel Horizon redirects you to the Sovereign Link screen automatically.
+</Warning>
+
+## The canvas workspace
+
+The main area of the Strategist is a dotted-grid canvas. This is where you construct your strategy by placing and arranging Neural Blocks.
+
+- **Dotted grid**: serves as your visual workspace. Blocks snap to visible positions so the layout stays readable.
+- **Connection lines**: when you place more than one block, the canvas draws connections between nodes automatically. The order in which you place blocks on the canvas defines the sequential logic — the flow runs left to right.
+- **Hint bar**: the bottom-left corner of the canvas reminds you of available interactions at a glance.
+
+<Tip>
+  You can drag placed nodes to reposition them anywhere on the canvas after dropping them. Click and hold a node to move it.
+</Tip>
+
+## Neural Blocks
+
+Neural Blocks are the building units of every strategy. You drag them from the left sidebar onto the canvas. Each block type represents a distinct role in the logic chain.
+
+<CardGroup cols={2}>
+  <Card title="AI Sentiment" icon="brain">
+    Executes downstream actions based on the tone of global news. Use this as a trigger when market sentiment drives your decision-making.
+  </Card>
+  <Card title="Yield Scan" icon="chart-line">
+    Monitors your returns continuously and activates downstream blocks when your yield falls below a defined target threshold.
+  </Card>
+  <Card title="Threshold Check" icon="bolt">
+    Evaluates a numeric condition and triggers the next block in the chain when that condition is met. Use this to add guardrails between a trigger and an action.
+  </Card>
+  <Card title="Auto-Swap" icon="arrow-right-arrow-left">
+    Executes an asset swap automatically when reached in the strategy flow. This is a terminal action block — the flow ends here.
+  </Card>
+</CardGroup>
+
+<Info>
+  Trigger blocks (**AI Sentiment** and **Yield Scan**) are always the start of a flow. Action blocks (**Auto-Swap** and **Guardian Alert**) are always the end of a flow — no further blocks can be chained after them.
+</Info>
+
+## Building a strategy
+
+<Steps>
+  <Step title="Open the Neural Strategist">
+    Click **Strategist** in the sidebar. The canvas workspace opens with an empty dotted grid.
+  </Step>
+  <Step title="Drag a trigger block onto the canvas">
+    From the **Neural Blocks** section of the left sidebar, drag a starting block — such as **AI Sentiment** or **Yield Scan** — onto the canvas and release it where you want it positioned.
+  </Step>
+  <Step title="Add action or condition blocks">
+    Drag additional blocks onto the canvas. Each new block you place is connected to the previous one automatically. The left-to-right order of placement defines the execution sequence.
+  </Step>
+  <Step title="Review the flow">
+    Confirm the connection lines reflect your intended logic. Right-click any node to remove it from the canvas if you need to adjust the chain.
+  </Step>
+  <Step title="Deploy to the Mesh">
+    Click **Deploy to Mesh** to activate the strategy on the decentralized network. Vexel Horizon analyzes your node graph, runs a neural simulation, and presents a verification report before the strategy goes live.
+  </Step>
+</Steps>
+
+## Managing the canvas
+
+| Action | How to perform it |
+|---|---|
+| Remove a node | Right-click the node on the canvas |
+| Clear all nodes | Click **Clear Canvas** in the bottom of the left sidebar |
+| Deploy the strategy | Click **Deploy to Mesh** (requires Sovereign Link) |
+
+## Combining blocks effectively
+
+<Tip>
+  Chain **AI Sentiment → Threshold Check → Auto-Swap** to build a sentiment-driven trading bot with a numeric guardrail. The Threshold Check block sits between the sentiment trigger and the swap action, so the swap only fires when both conditions are satisfied.
+</Tip>
+
+## Sovereign Link requirement
+
+Deploying a strategy to the Vexel Mesh requires an active Sovereign Link session. The network requires your biometric signature to authorize any capital movement initiated by an automated strategy. Without an authenticated session, the **Deploy to Mesh** button rejects the request.
+
+To authenticate, use the **Sovereign Link** option in the sidebar and scan the generated QR code with Vexel Mobile.
