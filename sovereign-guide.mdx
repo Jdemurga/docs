@@ -1,0 +1,71 @@
+---
+title: "Sovereign Guide"
+description: "The in-terminal Knowledge Base that explains every surface of Vexel Horizon, from Dashboard to Lattice Security."
+---
+
+The Sovereign Guide is the built-in knowledge base rendered inside Vexel Horizon itself. It lives under the **Guide** sidebar entry (`#guideSection`) and gives you a reading-friendly reference without leaving the terminal. Every article is localized through `lang/en.json` and `lang/es.json`, and the content switches instantly when you change the active language.
+
+## How the Guide is organized
+
+The Guide is split into two categories that match how Sovereigns operate the terminal:
+
+| Category | Topics |
+|---|---|
+| **Manual de uso** | Dashboard (The Vault), Market Hub (The Pulse), Gobernanza (The Mesh), Trading (The Engine), Strategist (The Brain) |
+| **Base técnica** | Yield Velocity, AI Confidence, Lattice Security, Sovereign Reasoning, The Mesh, Tutorial: Estrategia |
+
+Selecting a topic in the left sidebar swaps the content of `#guideTopicContent` with the localized article. Articles are stored in `app.js` as `knowledgeBaseEs` and `knowledgeBaseEn` objects keyed by topic id, and the active language is read from `localStorage.vexel_lang`.
+
+## When to use each topic
+
+<CardGroup cols={2}>
+  <Card title="Dashboard (The Vault)" icon="gauge">
+    Explains the Sovereign Dashboard layout, the Guest vs. Sovereign split, and how to interpret Total Liquidity and Neural Allocation.
+  </Card>
+  <Card title="Market Hub (The Pulse)" icon="globe">
+    Walks through the trending grid, AI confidence scores, and the Mesh ticker that stays visible across every section.
+  </Card>
+  <Card title="Governance (The Mesh)" icon="scale-balanced">
+    Describes how active proposals surface on the Community Board and how Sovereign votes are signed on mobile.
+  </Card>
+  <Card title="Trading (The Engine)" icon="arrows-rotate">
+    Documents the AI security scan that runs before every swap — liquidity, smart-contract security, and short-term price projection.
+  </Card>
+  <Card title="Strategist (The Brain)" icon="network-wired">
+    Introduces the no-code Neural Strategist, its node types, and the Sovereign Link requirement for deployment.
+  </Card>
+  <Card title="Yield Velocity" icon="bolt">
+    Covers the Adaptive Engine that turns asset performance, fees, and governance incentives into a per-second growth figure.
+  </Card>
+  <Card title="AI Confidence" icon="brain">
+    Explains the statistical probability score produced by the neural networks that back every AI proposal.
+  </Card>
+  <Card title="Lattice Security" icon="shield-halved">
+    Summarizes the lattice-based cryptography that makes the Sovereign Guardian signing flow quantum-resistant.
+  </Card>
+  <Card title="Sovereign Reasoning" icon="comment-dots">
+    Describes the `[MACRO]`, `[LIQUIDITY]`, and other tags you see in the reasoning feed and what triggers them.
+  </Card>
+  <Card title="The Mesh" icon="diagram-project">
+    Introduces the distributed infrastructure, the 15-second Mesh Pulse, and why Vexel is fault-tolerant by design.
+  </Card>
+  <Card title="Tutorial: Estrategia" icon="book">
+    Step-by-step guide to dragging nodes, defining the flow, and deploying a first strategy to the Mesh.
+  </Card>
+</CardGroup>
+
+## Localization
+
+- The Guide respects the language stored in `localStorage.vexel_lang` (`es` or `en`).
+- Article titles and categories are localized through `data-i18n` attributes in `index.html`.
+- Bodies live in `knowledgeBaseEs` / `knowledgeBaseEn` in `app.js`, so contributors can extend the Guide by adding new topic keys to both objects.
+
+## Implementation notes
+
+- The Guide shell is defined in `index.html` as `#guideSection` with a two-pane layout: a `.guide-sidebar` list of topics and a `.guide-viewport` that renders the active article.
+- Topic selection is wired via a delegated click listener on `.guide-nav-item` elements; the handler reads `dataset.topic` and calls `updateGuideContent(topic)`.
+- Navigating to the Guide does not require a Sovereign session — it is available in Guest Mode as a reference while you set up your Sovereign Link.
+
+<Info>
+  The Guide mirrors the structure of the public documentation you are reading now. Each topic links directly to the deeper reference under [Concepts](/concepts/the-mesh), [Intelligence Lab](/intelligence/overview), and the [Architecture](/architecture) page.
+</Info>

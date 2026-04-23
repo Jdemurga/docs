@@ -75,6 +75,8 @@ graph TD
 | **Sovereign UI** | `styles.css` | Custom design system with glassmorphism, CSS variables, dark theme, and blur/unblur rules keyed off `.is-sovereign`. |
 | **Shell** | `index.html` | Semantic skeleton: sidebar, main content sections, modals for Guardian and AI chat. |
 | **Voice engine** | `SovereignVoice` (in `app.js`) | Wraps the Web Speech API, maintains the chat history, and updates the microphone indicator. |
+| **Sovereign Guide** | `#guideSection` (in `index.html`) + `knowledgeBaseEs`/`knowledgeBaseEn` (in `app.js`) | In-terminal knowledge base localized via `localStorage.vexel_lang`. See [Sovereign Guide](/sovereign-guide). |
+| **Edge proxy** | `nginx.conf` | Reference Nginx configuration that serves the static bundle and reverse-proxies `/api`, `/brain`, and the Socket.io upgrade to Vexel Core and Brain. |
 
 ## Data flow
 
@@ -135,4 +137,5 @@ In production, Nginx serves the static assets and reverse-proxies `/api` to Vexe
 - [Authenticate with Sovereign Link](/sovereign-link) — end-to-end pairing flow
 - [WebSocket events](/api-reference/websocket-events) — every real-time event the browser handles
 - [Strategy Canvas](/intelligence/strategy-canvas) — node graph semantics deployed from Horizon
+- [Sovereign Guide](/sovereign-guide) — in-terminal knowledge base surfaced from `#guideSection`
 - [Vexel Core architecture](/core/architecture) — the backend that powers the terminal
