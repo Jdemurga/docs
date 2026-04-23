@@ -1,0 +1,106 @@
+---
+title: "Neural mesh and consensus"
+description: "How Vexel-Brain nodes discover each other, gossip intelligence vectors, and converge on a system-wide truth."
+---
+
+Multiple Vexel-Brain nodes run simultaneously across the Mesh. Each one shares an anonymized intelligence vector with its peers through Redis Pub/Sub, and the combined signal shapes every forecast the terminal displays.
+
+## Cluster membership
+
+`cluster_manager.py` maintains a live registry of Brain nodes. Every node publishes a periodic heartbeat on a Redis channel with its `NODE_ID`, `SPECIALIZATION`, and last-seen timestamp.
+
+`GET /cluster/status` returns the current view from the calling node:
+
+```json
+{
+  "own_id": "vexel-brain-12345",
+  "active_nodes": 3,
+  "mesh": {
+    "brain-67890": {
+      "last_seen": 1717344000.0,
+      "specialization": "Sentiment",
+      "status": "Healthy"
+    },
+    "brain-11223": {
+      "last_seen": 1717344001.0,
+      "specialization": "Macro",
+      "status": "Healthy"
+    }
+  }
+}
+```
+
+Typical specializations include `Sentiment`, `Macro`, `On-Chain`, and `General`. Horizon uses this payload to power the Mesh health indicator in the header.
+
+## Neural gossip
+
+`p2p_mesh.py` publishes an intelligence vector — the node's local sentiment, confidence, and RWA synergy — to the `vexel:p2p:neural_mesh` channel on a loop.
+
+Each message carries:
+
+- `node_id` — the sender's identifier.
+- `intelligence_vector` — a compact array of analytical signals.
+- `confidence` — self-reported confidence in the local intelligence.
+- `specialization` — the node's declared focus.
+
+Every subscriber updates its peer registry, and the `P2PMesh.collective_bias()` helper returns a confidence-weighted aggregate that flows into `/forecast` as `neural_mesh.collective_bias`.
+
+## Consensus
+
+`consensus.py` reconciles a node's local sentiment with the peer distribution.
+
+<Steps>
+  <Step title="Gather local sentiment">
+    The caller submits a `local_sentiment` score together with a context label.
+  </Step>
+  <Step title="Compare against peers">
+    The engine retrieves the latest peer intelligence vectors from the mesh cache.
+  </Step>
+  <Step title="Weight by confidence">
+    Peers with higher confidence receive more weight in the aggregate.
+  </Step>
+  <Step title="Output system truth">
+    The engine returns a `system_truth` value plus a `confidence` score that represents how strongly peers agree.
+  </Step>
+</Steps>
+
+## Governance simulation
+
+`GET /governance/consensus/{proposal_id}` simulates how the neural mesh would vote on a governance proposal.
+
+```json
+{
+  "proposal_id": "PROPOSAL_001",
+  "mesh_consensus": "Positive (82%)",
+  "peer_analysis": [
+    {
+      "peer": "Sovereign Alpha",
+      "vote": "FOR",
+      "reason": "Systemic risk reduction via gold is historically sound."
+    }
+  ],
+  "narrative_alignment": 0.88
+}
+```
+
+The Community Board uses this endpoint to surface Neural Consensus insights next to each active DAO proposal. See [Community Board overview](/community/overview) for the UI-side workflow.
+
+## Quantum defense
+
+`GET /defense/status` reports the Crystal-Mesh defensive posture. Brain continuously pulses a lattice-based verification (Dilithium-G1) across mobile guardians and tracks entropy anomalies.
+
+```json
+{
+  "quantum_defense_mode": "Crystal-Mesh Active",
+  "current_entropy_anomaly": 0.1234,
+  "threat_level": "Minimal",
+  "pqc_verification_pulse": "LATTICE_PULSE_SYNC_OK",
+  "mitigation_strategy": "Sovereign Lattice Shield (Dilithium-G1) active on all mobile guardians.",
+  "pqc_nodes": 4,
+  "last_quantum_auth": "Just Now"
+}
+```
+
+<Note>
+  The defense status endpoint is public — Horizon polls it from Guest Mode to render the global Mesh health banner without requiring a Sovereign session.
+</Note>

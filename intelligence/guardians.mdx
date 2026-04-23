@@ -1,0 +1,140 @@
+---
+title: "Guardians and stress tests"
+description: "Vexel-Brain ships a defensive suite — transaction sanitization, correlation guardrails, and historical stress scenarios — to protect Sovereign portfolios."
+---
+
+Guardians are the defensive layer of Vexel-Brain. Before any proposal leaves the terminal, Brain can sanitize the transaction, audit the portfolio for correlation risk, and project how the portfolio would survive historical market events.
+
+## Transaction sanitization
+
+`POST /guardian/sanitize` runs an AI-driven safety scan on a proposed transaction.
+
+```json
+{
+  "from_asset": "USD",
+  "to_asset": "SCAM-COIN",
+  "amount": 100000,
+  "destination": "0xmaliciousaddress",
+  "user_id": "user123",
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "txn_id": "vexel-safe-1717344000",
+  "safety_score": 0.0,
+  "verdict": "DANGEROUS",
+  "warnings": [
+    "DESTINATION_BLACKLISTED",
+    "LOW_LIQUIDITY_TOKEN_DETECTION",
+    "HIGH_VALUE_ANOMALY"
+  ],
+  "recommendation": "Transaction aborted for security reasons."
+}
+```
+
+The sanitizer checks three categories of signals:
+
+- **Destination reputation** — blacklists and known malicious addresses.
+- **Token quality** — low-liquidity or honeypot patterns on the `to_asset`.
+- **Value anomalies** — amounts that deviate significantly from the Sovereign's historical activity.
+
+<Warning>
+  Guardian verdicts are advisory. The terminal surfaces the verdict, but the biometric approval still happens on Vexel Mobile — the mobile guardian can reject a proposal even if Brain marks it `SAFE`.
+</Warning>
+
+## Correlation guardrails
+
+`POST /guardrails/scan` evaluates a full portfolio for correlation concentration and suggests diversifying assets.
+
+```json
+{
+  "portfolio": [
+    {"symbol": "TSLA", "weight": 0.4, "correlations": {"SPX": 0.8, "QQQ": 0.9}},
+    {"symbol": "GLD", "weight": 0.2, "correlations": {"SPX": -0.1}}
+  ],
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "risk_index": 0.46,
+  "risk_level": "Medium",
+  "overexposed_assets": ["TSLA"],
+  "advice": "High correlation detected in: TSLA. Consider adding inversely correlated assets.",
+  "suggestions": [
+    {"symbol": "GLD", "reason": "Inverse correlation to equity during stress"}
+  ]
+}
+```
+
+Use the response to power the **Neural Audit** action in the Intelligence Lab — the suggestions surface directly as diversification proposals.
+
+## Stress testing
+
+`POST /stress-test` applies a named historical scenario to the current portfolio.
+
+```json
+{
+  "portfolio": [
+    {"symbol": "GOOG", "weight": 0.6, "type": "stock"},
+    {"symbol": "ETH", "weight": 0.4, "type": "crypto"}
+  ],
+  "scenario_id": "CRYPTO-WINTER-2022",
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "scenario": "CRYPTO-WINTER-2022",
+  "description": "Massive deleveraging in digital assets. Tech stocks also heavily impacted.",
+  "total_impact_pct": -49.0,
+  "surviving_value": 5100.0,
+  "breakdown": [
+    {"symbol": "GOOG", "impact": "-15.0%", "loss": 900.0},
+    {"symbol": "ETH", "impact": "-70.0%", "loss": 2800.0}
+  ],
+  "survival_status": "Warning"
+}
+```
+
+Known scenarios include `COVID-2020`, `DOTCOM-2000`, and `CRYPTO-WINTER-2022`. The Intelligence Lab surfaces these under the **AI Scenarios** sidebar.
+
+## Portfolio orchestration
+
+`POST /orchestrate` compares multiple portfolios and suggests a rebalancing direction based on relative alpha.
+
+```json
+{
+  "portfolios": [
+    {"name": "Growth Alpha", "score": 0.7},
+    {"name": "Stable Beta", "score": 0.4}
+  ],
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "action": "Rebalance",
+  "primary_target": "Growth Alpha",
+  "source": "Stable Beta",
+  "suggested_shift_pct": 3.0,
+  "narrative": "Based on global sentiment, Growth Alpha shows stronger relative alpha. Suggesting a 3.0% capital shift from Stable Beta."
+}
+```
+
+<Info>
+  Horizon uses this endpoint to coordinate capital across multiple Sovereign vaults. The final shift is still gated by a biometric signature from Vexel Mobile.
+</Info>
