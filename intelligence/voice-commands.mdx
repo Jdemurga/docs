@@ -1,0 +1,107 @@
+---
+title: "Voice commands and intent routing"
+description: "Turn voice transcripts and chat text into structured sovereign intents using the Vexel-Brain NLP router."
+---
+
+Vexel-Brain ships a lightweight natural-language router that parses voice transcripts and chat commands into actionable intents. Horizon uses it to power the AI Chat box and mobile voice control without shipping a heavyweight LLM to the edge.
+
+## How the router works
+
+`voice_processor.py` inspects the lowercased transcript and matches it against three intent families:
+
+| Intent family | Trigger keywords | Action |
+|---|---|---|
+| Financial health | `portfolio`, `status`, `health`, `pulse`, `how is` | `SUMMARY_REQUEST` / `FINANCIAL_HEALTH_CHECK` |
+| Trading | `buy`, `sell`, `swap`, `shift`, `rebalance`, `invest` | `TRADE_ATTEMPT` / `ASSET_REBALANCING` |
+| Governance | `proposal`, `governance`, `vote` | `GOVERNANCE_QUERY` / `DAO_PARTICIPATION` |
+
+For trading intents the router extracts the asset (`PAXG`, `BTC`, `ETH`), the quantity, whether it is a percentage, and the direction (`BUY` or `SELL`).
+
+## Endpoints
+
+### `POST /voice/interpret`
+
+Primary endpoint. Returns the structured intent payload for the matched action.
+
+Request:
+
+```json
+{
+  "text": "How is my portfolio health today?"
+}
+```
+
+Response:
+
+```json
+{
+  "action": "SUMMARY_REQUEST",
+  "intent": "FINANCIAL_HEALTH_CHECK",
+  "message": "Analyzing global portfolio health and sovereign narrative alignment...",
+  "context": "User requested a holistic system pulse."
+}
+```
+
+Trading example:
+
+```json
+{
+  "text": "Shift 10% into gold"
+}
+```
+
+Response:
+
+```json
+{
+  "action": "TRADE_ATTEMPT",
+  "intent": "ASSET_REBALANCING",
+  "params": {
+    "symbol": "PAXG",
+    "quantity": 10,
+    "is_percentage": true,
+    "direction": "BUY"
+  },
+  "message": "Sovereign intent detected: shift 10% into gold. Preparing execution payload for verification.",
+  "reasoning": "Voice authorization requires secondary biometric confirmation for all capital movements."
+}
+```
+
+### `POST /voice/process`
+
+Alias endpoint that runs the same interpreter. Kept for legacy mobile clients that still call `/voice/process`. Prefer `/voice/interpret` for new integrations.
+
+<Warning>
+  Voice intents never execute trades directly. `TRADE_ATTEMPT` responses are forwarded to Vexel Mobile for biometric signing — Brain only extracts the intent and parameters.
+</Warning>
+
+## Scenario interpreter
+
+`POST /simulate/interpret` reuses the same NLP router but in scenario mode. Feed it a free-form "what if" sentence and it returns the parameters the Simulation Lab needs.
+
+Request:
+
+```json
+{
+  "command": "What if there is a crypto crash with massive panic?"
+}
+```
+
+Response:
+
+```json
+{
+  "trend": -15.0,
+  "sentiment": 0.1,
+  "volume": 1.0,
+  "interpretation": "Neural interpretation: Trend -15.0%, Sentiment 0.1, Volume 1.0"
+}
+```
+
+The interpreter understands keywords in English and Spanish, including:
+
+- **Trend** — `crash`, `drop`, `plunge`, `desplome`, `caída` (negative); `moon`, `boom`, `pump`, `subida`, `alza` (positive); `dip`, `corrección` (mild negative).
+- **Sentiment** — `panic`, `fear`, `pánico`, `miedo`, `bearish` (fearful); `bullish`, `greedy`, `euforia`, `confidence` (greedy).
+- **Volume** — `massive`, `huge`, `crazy`, `mucho` (high); `low`, `quiet`, `dead`, `tranquilo` (low).
+
+The output plugs directly into `POST /simulate` — see [Simulation Lab](/intelligence/simulation-lab).

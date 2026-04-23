@@ -90,3 +90,33 @@ Once running, the interactive OpenAPI UI is available at `http://localhost:8000/
 <Tip>
   For production throughput, install `torch` with CUDA support and run Brain on a GPU-enabled host. FinBERT inference dominates latency on the `/analyze` and `/forecast` endpoints.
 </Tip>
+
+## Endpoint map
+
+| Method | Endpoint | Purpose | Reference |
+|---|---|---|---|
+| `GET` | `/` | Health check. | — |
+| `POST` | `/analyze` | Single-headline FinBERT sentiment. | [Forecast and sentiment](/intelligence/forecast) |
+| `POST` | `/analyze-batch` | Aggregated batch sentiment with evidence. | [Forecast and sentiment](/intelligence/forecast) |
+| `POST` | `/forecast` | Directional prediction with neural-mesh bias. | [Forecast and sentiment](/intelligence/forecast) |
+| `POST` | `/optimize` | Adaptive dimension-weight update. | [Forecast and sentiment](/intelligence/forecast) |
+| `POST` | `/guardrails/scan` | Correlation risk audit. | [Guardians and stress tests](/intelligence/guardians) |
+| `POST` | `/stress-test` | Historical scenario projection. | [Guardians and stress tests](/intelligence/guardians) |
+| `POST` | `/guardian/sanitize` | Transaction safety scan. | [Guardians and stress tests](/intelligence/guardians) |
+| `POST` | `/orchestrate` | Multi-portfolio rebalance suggestion. | [Guardians and stress tests](/intelligence/guardians) |
+| `GET`  | `/cluster/status` | Active Brain node registry. | [Neural mesh and consensus](/intelligence/neural-mesh) |
+| `GET`  | `/governance/consensus/{id}` | Simulated mesh vote on a proposal. | [Neural mesh and consensus](/intelligence/neural-mesh) |
+| `GET`  | `/defense/status` | Crystal-Mesh quantum defense posture. | [Neural mesh and consensus](/intelligence/neural-mesh) |
+| `POST` | `/voice/interpret` | Route chat or voice text to a structured intent. | [Voice commands](/intelligence/voice-commands) |
+| `POST` | `/voice/process` | Legacy voice alias. | [Voice commands](/intelligence/voice-commands) |
+| `POST` | `/simulate/interpret` | Parse a what-if scenario into parameters. | [Voice commands](/intelligence/voice-commands) |
+| `POST` | `/simulate` | Run a what-if simulation. | [Simulation Lab](/intelligence/simulation-lab) |
+| `POST` | `/canvas/simulate` | Evaluate a Strategy Canvas DAG. | [Strategy Canvas](/intelligence/strategy-canvas) |
+| `POST` | `/news/cluster` | Cluster headlines by topic. | [Market intelligence](/intelligence/market-intelligence) |
+| `POST` | `/sentiment/on-chain` | On-chain whale and flow snapshot. | [Market intelligence](/intelligence/market-intelligence) |
+| `POST` | `/analyze-docs` | Risk keyword scan on legal documents. | [Market intelligence](/intelligence/market-intelligence) |
+| `POST` | `/report/summary` | Plain-language weekly performance recap. | [Market intelligence](/intelligence/market-intelligence) |
+| `GET`  | `/discover` | Emerging-asset scan proposals. | [Market intelligence](/intelligence/market-intelligence) |
+| `GET`  | `/bot/status` | Trading bot execution mode. | [Market intelligence](/intelligence/market-intelligence) |
+
+Every `POST` endpoint (plus the governance and discovery `GET` endpoints) is protected by the HMAC-SHA256 signature guard described above.

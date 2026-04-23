@@ -1,0 +1,163 @@
+---
+title: "Market intelligence endpoints"
+description: "News clustering, on-chain sentiment, asset discovery, document risk analysis, and weekly portfolio summaries produced by Vexel-Brain."
+---
+
+Beyond forecasting and guardians, Vexel-Brain exposes a set of focused market-intelligence endpoints. Horizon and Vexel Mobile use them to hydrate the Market Hub, the weekly Sovereign report, and the AI Chat narratives.
+
+## News clustering
+
+`POST /news/cluster` groups headlines into topical clusters using a keyword-based heuristic. The response surfaces the dominant topics and whether each cluster is statistically significant.
+
+Request:
+
+```json
+{
+  "headlines": [
+    "Bitcoin surges past $70k on ETF inflows",
+    "Fed signals pause on rate hikes",
+    "Ethereum ETF approval expected",
+    "Bitcoin open interest hits ATH"
+  ],
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "clusters": [
+    {
+      "topic": "Bitcoin Surges",
+      "count": 2,
+      "summary": "Bitcoin surges past $70k on ETF inflows",
+      "is_significant": false
+    }
+  ]
+}
+```
+
+`is_significant` is `true` when a cluster contains more than two headlines — Horizon uses this flag to decide whether to promote the topic into the Market Hub digest.
+
+## On-chain sentiment
+
+`POST /sentiment/on-chain` produces a simulated on-chain snapshot for a symbol, blending whale activity and exchange flow heuristics into a single score.
+
+Request:
+
+```json
+{
+  "symbol": "BTC",
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "symbol": "BTC",
+  "on_chain_score": 0.82,
+  "whale_activity": "High Accumulation",
+  "exchange_flow": "Outflow (Bullish)",
+  "summary": "Strong on-chain fingerprints for BTC. Significant accumulation detected in whale wallets."
+}
+```
+
+The summary is localized for `en` and `es`.
+
+## Asset discovery
+
+`GET /discover` returns a curated list of emerging narratives and symbols worth evaluating. Horizon surfaces this payload on the Market Hub as AI-proposed research targets.
+
+Response:
+
+```json
+{
+  "status": "Scanning Complete",
+  "proposals": [
+    {
+      "symbol": "CRBN-TOKEN",
+      "narrative": "Decentralized Carbon Credit Ledger",
+      "relevance_score": 0.88,
+      "reasoning": "High institutional interest detected in green-DeFi narratives."
+    },
+    {
+      "symbol": "LST-INDX",
+      "narrative": "Liquid Staking Yield Aggregator",
+      "relevance_score": 0.92,
+      "reasoning": "Sustained TVL growth in LST protocols matching 2021 bull run fingerprints."
+    }
+  ]
+}
+```
+
+<Info>
+  The discovery scan is read-only. No transactions are triggered — Horizon lets the Sovereign approve further research or a watch entry manually.
+</Info>
+
+## Document risk analysis
+
+`POST /analyze-docs` inspects free-form document text for legal and financial red flags. It is intended for term sheets, prospectuses, and governance proposals that come bundled with a Neural Consensus vote.
+
+Request:
+
+```json
+{
+  "text": "The issuer may default on scheduled interest payments if the reserve ratio falls below 110%.",
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "analysis_type": "Legal/Risk Document Parser",
+  "risk_score": 0.25,
+  "detected_clauses": ["default"],
+  "summary": "Document successfully parsed for systemic financial risks.",
+  "recommendation": "No critical legal red flags detected."
+}
+```
+
+Risk keywords include `default`, `litigation`, `bankruptcy`, `regulatory fine`, `liability`, and their Spanish equivalents (`quiebra`, `demanda`, `suspenda`). `recommendation` escalates to `High Caution` / `Precaución Alta` once `risk_score` exceeds `0.4`.
+
+## Weekly portfolio summary
+
+`POST /report/summary` generates a plain-language performance recap. Horizon uses this endpoint for the Sovereign weekly email and the in-app "This Week" card.
+
+Request:
+
+```json
+{
+  "performance": [
+    { "symbol": "BTC", "change": 5.2 },
+    { "symbol": "ETH", "change": 1.1 },
+    { "symbol": "PAXG", "change": -0.4 }
+  ],
+  "lang": "en"
+}
+```
+
+Response:
+
+```json
+{
+  "summary": "It's been a steady week for your portfolio. Your top performer was BTC with a 5.20% gain, while PAXG lagged with a -0.40% move. Overall, the portfolio moved 1.97% on average."
+}
+```
+
+Summaries swap between "steady" and "volatile" framing once the absolute average move crosses 5%.
+
+## Trading bot status
+
+`GET /bot/status` returns a lightweight status payload. Brain does not run live trading today — the endpoint exists so Horizon can display the current execution mode and gate automation UIs until live trading is enabled.
+
+```json
+{
+  "bot": "Trading bot structure ready",
+  "mode": "Paper Trading"
+}
+```
