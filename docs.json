@@ -82,6 +82,29 @@
                 ]
               }
             ]
+          },
+          {
+            "tab": "Vexel Core",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "core/overview",
+                  "core/getting-started",
+                  "core/architecture",
+                  "core/security"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "core/api/authentication",
+                  "core/api/market",
+                  "core/api/realtime",
+                  "core/api/governance"
+                ]
+              }
+            ]
           }
         ]
       },

@@ -1,0 +1,108 @@
+---
+title: "Real-time events"
+description: "Socket.io gateways, event contracts, and the biometric approval flow for Vexel Core."
+---
+
+Vexel Core exposes two Socket.io gateways. `EventsGateway` handles general signaling — Sovereign Link, market pulses, pending actions. `TerminalGateway` carries high-frequency market depth for the Horizon terminal.
+
+## EventsGateway
+
+**Namespace:** `/` (default)
+
+### Client to server
+
+| Event | Payload | Description |
+|---|---|---|
+| `msgToServer` | `string` | Broadcast a message to every connected client |
+| `registerSession` | `string` (sessionId) | Map the current socket to a Sovereign Link session ID |
+
+### Server to client
+
+| Event | Payload | Target | Description |
+|---|---|---|---|
+| `msgToClient` | `string` | All clients | Relayed message from any client |
+| `sessionLinked` | `{ token, user }` | Horizon socket | Sovereign Link handshake succeeded; Mode switches to Sovereign |
+| `priceUpdate` | `{ symbol, price, change, timestamp }` | All clients | Live price update for a watched asset |
+| `marketAlert` | `{ type, symbol, message, timestamp }` | All clients | Divergence alert or other market signal |
+| `marketPulse` | `{ totalValue, yieldVelocity, confidence, timestamp, meshStatus }` | All clients | Global ecosystem pulse emitted every five seconds |
+| `pending_action` | `{ txnId, type, details, safetyScore, warnings }` | Mobile socket | Action awaiting biometric approval |
+| `action_completed` | `{ txnId, status, result, quantum_secured }` | Horizon socket | Action fully authorized and executed |
+
+## TerminalGateway
+
+**Namespace:** `/terminal`
+
+Used by Horizon for low-latency market data.
+
+### Client to server
+
+| Event | Payload | Description |
+|---|---|---|
+| `subscribe.market_depth` | `{ symbol }` | Subscribe to live market depth for the given symbol |
+
+### Server to client
+
+| Event | Payload | Description |
+|---|---|---|
+| `terminal.handshake` | `{ status, stream_mode, encryption }` | Sent on connect to confirm the gateway is ready |
+| `terminal.market_event` | Market event payload | High-frequency stream of market events |
+
+## Sovereign Link flow
+
+The Sovereign Link is the QR handshake that binds a Horizon browser to a Mobile identity.
+
+<Steps>
+  <Step title="Horizon connects">
+    Horizon opens a socket on `/`, records its `socket.id`, and emits `registerSession` with a freshly generated `sessionId`.
+  </Step>
+  <Step title="Horizon renders the QR">
+    The browser shows a QR encoding the `sessionId`.
+  </Step>
+  <Step title="Mobile scans and posts">
+    Vexel Mobile scans the QR and calls `POST /auth/link` with the `sessionId` and the Mobile JWT.
+  </Step>
+  <Step title="Core emits sessionLinked">
+    `AuthService` validates the JWT and calls `EventsGateway.notifySessionLink()`. The gateway sends `sessionLinked` directly to the Horizon `socket.id`.
+  </Step>
+  <Step title="Horizon unlocks">
+    Horizon stores the new token and transitions to Sovereign Mode.
+  </Step>
+</Steps>
+
+## Execution approval flow
+
+Sensitive operations use a two-step pattern: initiate through REST, approve over WebSocket.
+
+<Steps>
+  <Step title="Client initiates">
+    Horizon (or an AI agent) calls `POST /market/execute`, `/market/voice/command`, or `/market/autonomous/rebalance`.
+  </Step>
+  <Step title="Core runs a guardrail scan">
+    `ExecutionService` posts the payload to Vexel Brain's `/guardian/sanitize` endpoint for a safety score.
+  </Step>
+  <Step title="Core parks the transaction">
+    Core assigns a `txnId`, stores the payload in `pendingActions`, and emits `pending_action` to the Mobile socket.
+  </Step>
+  <Step title="Mobile approves biometrically">
+    The Mobile app prompts for Face ID or Touch ID, signs the payload, and optionally adds a hybrid PQC signature via HSM.
+  </Step>
+  <Step title="Mobile authorizes">
+    Mobile calls `POST /market/authorize` with the `txnId` and `signature`.
+  </Step>
+  <Step title="Core verifies and executes">
+    `ExecutionService.authorizeAction()` validates the signature. On success, the real work happens — for example `TradingService.placeOrder` — and the ledger records the action.
+  </Step>
+  <Step title="Horizon receives confirmation">
+    Core emits `action_completed` to Horizon with the result and the `quantum_secured` flag.
+  </Step>
+</Steps>
+
+<Info>
+  Pending actions are in-memory. Restarting Core drops any un-authorized transactions; clients must re-initiate them.
+</Info>
+
+## Connection tips
+
+- Use [Socket.io client](https://socket.io/docs/v4/client-api/) and match the version range Core accepts (`socket.io-client` `^4.8.x`).
+- Clients should subscribe after the `connect` event to avoid missing handshake payloads.
+- Authenticated clients should include their JWT in the Socket.io `auth` payload so the server can bind the socket to a user.

@@ -1,0 +1,131 @@
+---
+title: "Authentication API"
+description: "Register users, issue JWTs, link Sovereign sessions, and update preferences through the Vexel Core Auth module."
+---
+
+The Auth module exposes user registration, login, Sovereign Link session binding, and preference updates. Every authenticated endpoint expects a bearer JWT in the `Authorization` header.
+
+## Base path
+
+All endpoints are rooted at `/auth`.
+
+## Endpoints
+
+### Register a user
+
+`POST /auth/signup`
+
+Creates a user record and returns a session JWT.
+
+**Body**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "strong-password",
+  "displayName": "Satoshi"
+}
+```
+
+**Response**
+
+```json
+{
+  "access_token": "<jwt>",
+  "user": {
+    "id": "<uuid>",
+    "email": "user@example.com",
+    "displayName": "Satoshi"
+  }
+}
+```
+
+### Log in
+
+`POST /auth/login`
+
+Validates credentials and returns a fresh JWT.
+
+**Body**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "strong-password"
+}
+```
+
+**Response**
+
+```json
+{
+  "access_token": "<jwt>",
+  "user": { "id": "<uuid>", "email": "user@example.com" }
+}
+```
+
+### Link a Sovereign session
+
+`POST /auth/link` — **JWT required**
+
+Binds a Vexel Horizon browser session to the authenticated Mobile identity. Horizon shows a QR code encoding a `sessionId`; Mobile posts the scanned ID here.
+
+**Body**
+
+```json
+{
+  "sessionId": "4f2c-9a11"
+}
+```
+
+**Behavior**
+
+- Core validates the Mobile JWT.
+- `EventsGateway.notifySessionLink()` emits the `sessionLinked` event to the Horizon socket mapped to `sessionId`.
+- Horizon receives a new token and transitions to Sovereign Mode.
+
+See [Real-time events](/core/api/realtime) for the WebSocket contract.
+
+### Update preferences
+
+`POST /auth/preferences` — **JWT required**
+
+Updates mutable user preferences such as language.
+
+**Body**
+
+```json
+{
+  "preferredLanguage": "es"
+}
+```
+
+**Response**
+
+```json
+{
+  "status": "ok",
+  "user": { "id": "<uuid>", "preferredLanguage": "es" }
+}
+```
+
+## JWT strategy
+
+Vexel Core uses `passport-jwt` with the `JWT_SECRET` environment variable. Include the token on every protected request:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+<Info>
+  JWTs carry `userId` and `email` claims. Controllers that extend `@UseGuards(AuthGuard('jwt'))` receive the decoded payload on `req.user`.
+</Info>
+
+## Error responses
+
+| Status | Meaning |
+|---|---|
+| `400` | Malformed body or missing fields |
+| `401` | Invalid credentials or expired token |
+| `409` | Email already registered during signup |
+| `500` | Unexpected server error — check Core logs |

@@ -1,0 +1,98 @@
+---
+title: "Governance API"
+description: "Create DAO proposals, cast votes, and read the public marketplace of narrative portfolios."
+---
+
+The Governance module implements the DAO surface of the Vexel ecosystem. Members create proposals, cast votes, and read public outcomes through the Market module's public routes and the Marketplace controller.
+
+## Authenticated endpoints
+
+All governance write operations require a bearer JWT.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/governance/proposals` | List DAO proposals visible to the authenticated user |
+| `POST` | `/market/governance/propose` | Create a new proposal |
+| `POST` | `/market/governance/vote` | Cast a vote on an existing proposal |
+
+### Create a proposal
+
+`POST /market/governance/propose`
+
+**Body**
+
+```json
+{
+  "title": "Increase RWA allocation cap",
+  "description": "Raise the ecosystem RWA cap from 15% to 20%.",
+  "metadata": { "category": "allocation" }
+}
+```
+
+**Response**
+
+```json
+{
+  "id": "<uuid>",
+  "title": "Increase RWA allocation cap",
+  "status": "open",
+  "createdAt": "2026-04-23T17:00:00Z"
+}
+```
+
+### Cast a vote
+
+`POST /market/governance/vote`
+
+**Body**
+
+```json
+{
+  "proposalId": "<uuid>",
+  "support": true
+}
+```
+
+Set `support` to `true` for Support, `false` for Against.
+
+## Public endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/market/public/proposals` | Public-facing proposals for Guest Mode |
+| `GET` | `/marketplace/portfolios` | Public narrative portfolios with trust scores |
+| `GET` | `/marketplace/global-alpha` | Global narrative alpha score |
+
+## Entities
+
+The Governance module persists two TypeORM entities.
+
+### Proposal
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `title` | string | Proposal title |
+| `description` | text | Proposal body |
+| `status` | enum | `open`, `closed`, `passed`, `rejected` |
+| `createdAt` | timestamptz | Creation timestamp |
+| `authorId` | UUID | Author user ID |
+| `metadata` | jsonb | Arbitrary metadata |
+
+### Vote
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `proposalId` | UUID | Target proposal |
+| `voterId` | UUID | Voting user |
+| `support` | boolean | Support or Against |
+| `createdAt` | timestamptz | Vote timestamp |
+
+## Neural consensus
+
+The Horizon Community Board surfaces each proposal with a neural consensus score. Core does not compute the score directly; it proxies the call through `ForecastService` to Vexel Brain, which applies the model. See [Sovereign Reasoning](/concepts/sovereign-reasoning) for how the Brain treats governance signals.
+
+<Info>
+  Voting closes when a proposal's `status` transitions to `closed`. Core rejects votes with an error once the window is over.
+</Info>
