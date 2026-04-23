@@ -1,40 +1,40 @@
 ---
-title: "Vexel Horizon Security FAQ: Sessions and Lattice Protection"
-description: "Common questions about Vexel Horizon session security, why each transaction needs a biometric signature from Vexel Mobile, and what Lattice Security means."
+title: "Security FAQ: Sessions, Signatures, and Lattice Protection"
+description: "Common questions about Vexel Horizon session security, why each write action needs a biometric signature from Vexel Mobile, and what Lattice Security means."
 ---
 
-Vexel Horizon is built on the premise that you — and only you — should be able to authorize actions on your assets. This page explains the security model behind Sovereign Link, how your session is stored and terminated, and what Lattice Security means in practice for the safety of your capital.
+Vexel Horizon is built on the premise that you — and only you — should be able to authorize actions on your assets. This page explains the security model behind Sovereign Link, how your session is stored and terminated, and what Lattice Security means in practice.
 
 <AccordionGroup>
 
   <Accordion title="Why do I need to scan a QR code to log in?">
     Vexel Horizon does not use passwords. Instead, it uses a **QR-based Sovereign Link** to bind your biometric identity (stored on Vexel Mobile) to your current browser session.
 
-    When you scan the QR code, your mobile device — which already holds your verified biometrics — confirms your identity and sends a signed token back to the terminal. This means:
+    When you scan the QR, your mobile device — which already holds your verified biometrics — confirms your identity and sends a signed token back to the terminal over the Socket.io connection. This design means:
 
     - **Only you can authorize actions**, because only your physical device holds your biometrics.
-    - **A compromised browser session cannot be used to trade or vote** without the physical mobile device.
-    - Even if someone is looking at your screen, they cannot approve any write operation without your biometrics.
+    - **A compromised browser session cannot trade or vote** without the physical mobile device.
+    - Even someone looking at your screen cannot approve any write operation without your biometrics.
 
-    Each QR code is generated on-the-fly for the specific session and action being authorized. It expires after use.
+    Each QR code is generated on-the-fly for a specific session and action. It expires after use.
 
     <Tip>
-      To start a Sovereign session, open Vexel Mobile, navigate to **Profile &gt; Sovereign Link**, and scan the QR displayed on the Horizon terminal.
+      To start a Sovereign session, open Vexel Mobile, go to **Profile &gt; Sovereign Link**, and scan the QR displayed on the Horizon terminal.
     </Tip>
   </Accordion>
 
   <Accordion title="What is Lattice Security?">
-    Vexel uses **lattice-based cryptography** — a quantum-resistant signing protocol — to secure all transactions processed through the Sovereign Guardian.
+    Vexel uses **lattice-based cryptography** — a quantum-resistant signing protocol — to secure all actions processed through the Sovereign Guardian.
 
-    Standard financial systems rely on RSA or elliptic curve cryptography (ECC). These algorithms are vulnerable to attacks from sufficiently powerful quantum computers. Lattice-based cryptography is designed to remain secure against quantum attacks, making it a forward-safe choice for protecting long-term asset holdings.
+    Standard financial systems rely on RSA or elliptic curve cryptography (ECC), which are vulnerable to sufficiently powerful quantum computers. Lattice-based cryptography is designed to remain secure against quantum attacks, making it a forward-safe choice for long-term asset protection.
 
-    When a transaction is signed and executed via Sovereign Guardian, the execution feedback panel labels it as **`LATTICE_VERIFIED`**, confirming that quantum-resistant signing was applied to that operation.
+    When a completed action returns to the terminal, the execution feedback panel labels it as **`LATTICE_VERIFIED`**, confirming that quantum-resistant signing was applied.
   </Accordion>
 
   <Accordion title="Where is my session stored?">
-    After a successful Sovereign Link authentication, your session credentials are stored securely in your browser. The terminal reads these on every page load to determine your session state. Your credentials are only used to verify your identity for requests from your current browser session and are not shared with third parties.
+    After a successful Sovereign Link authentication, your session credentials are stored in the browser's `localStorage` under `vexel_jwt` (your token) and `vexel_user` (your profile). The terminal reads these on every page load to determine your session state. Credentials are tied to the session ID from the QR handshake and are not shared with third parties.
 
-    To end your session, click **DISCONNECT SESSION** in the sidebar user area. This clears your credentials and reloads the terminal in Collective Mode.
+    To end your session, click **✕ DISCONNECT SESSION** in the sidebar user area. This clears your credentials, removes the `is-sovereign` class from the `body` element, and reloads the terminal in Guest Mode.
 
     <Warning>
       Clearing your browser's site data manually will also end your session. You will need to re-authenticate via Sovereign Link on your next visit.
@@ -42,49 +42,49 @@ Vexel Horizon is built on the premise that you — and only you — should be ab
   </Accordion>
 
   <Accordion title="Can I be logged out remotely?">
-    Yes. Vexel Mobile can revoke your browser session remotely at any time. If your session is revoked from your mobile device, the terminal automatically:
+    Yes. Vexel Mobile can revoke your browser session remotely at any time. If your session is revoked, the terminal receives a `session_revoked` event and automatically:
 
-    1. Displays a "Session revoked" alert in the activity feed.
-    2. Clears your session credentials from the browser.
-    3. Reloads the terminal in Collective Mode after a brief delay.
+    1. Logs a `CRITICAL: Session revoked from mobile device.` entry in the activity feed.
+    2. Clears `vexel_jwt` and `vexel_user` from local storage.
+    3. Reloads the terminal in Guest Mode after a brief delay.
 
-    This remote revocation capability ensures that if your device is lost or you suspect unauthorized access to your browser, you can immediately cut off the active session without needing physical access to the computer.
+    This ensures that if your device is lost or you suspect unauthorized access to your browser, you can cut off the session immediately without needing physical access to the computer.
   </Accordion>
 
   <Accordion title="Why does every write operation require a fresh mobile signature?">
-    Authenticating via Sovereign Link establishes your session, but it does not pre-authorize all future actions. Every **write operation** — executing a trade, casting a governance vote, deploying a strategy to The Mesh, or activating Risk Insurance — requires a **fresh biometric signature** from Vexel Mobile.
+    Sovereign Link establishes your session, but it does not pre-authorize future actions. Every **write action** — approving an AI Proposal, syncing an Intelligence Lab strategy, casting a Community Board vote — requires a **fresh biometric signature** from Vexel Mobile.
 
-    The Sovereign Guardian modal appears each time, displaying a new QR that encodes your session ID and the specific action being authorized. You must scan it with Vexel Mobile and confirm with your biometrics to proceed.
+    The Sovereign Guardian modal appears for each action, displaying a new QR that encodes your session ID and the specific intent. You scan it with Vexel Mobile and confirm with your biometrics to proceed.
 
-    This design means that even if an attacker gained access to your active browser session (for example, through a phishing page or session token theft), they could not execute any capital operation without your physical device and biometrics.
+    This design means that even if an attacker gained access to your active browser session (for example, via a phishing page or session token theft), they could not commit any capital operation without your physical device and biometrics.
 
     <Info>
-      Each QR is single-use — it encodes your unique session ID and the specific action being authorized. It expires after the action is completed or cancelled.
+      Each QR is single-use — it encodes your unique session ID and the specific action. It expires after the action is completed or cancelled.
     </Info>
   </Accordion>
 
   <Accordion title="Is the QR code itself secure?">
-    Yes. Each QR code is generated dynamically on the terminal for the exact action being authorized. The payload encoded in the QR contains:
+    Yes. Each QR is generated dynamically for the exact action being authorized. The payload contains:
 
     - Your unique **session ID** for the current browser session
-    - The **specific action** being authorized (e.g., "Voting FOR: Proposal #12", "Swap 0.5 ETH")
+    - The **specific action** being authorized (for example, `Voting FOR: Proposal #12`, or `Authorize BUY BTC via Vexel Autonomous Logic`)
 
-    This data is encoded as JSON, meaning the QR is tightly scoped to one action in one session. A QR code from a previous action cannot be reused to authorize a different one.
+    Data is encoded as JSON, so the QR is tightly scoped to one action in one session. A QR from a previous action cannot be reused to authorize a different one.
 
     <Warning>
       Never share a screenshot or photo of an active QR code during an authorization request. If someone scans it before you do, they may be able to authorize the action using your session.
     </Warning>
   </Accordion>
 
-  <Accordion title="What happens if my Sovereign Link connection is lost?">
+  <Accordion title="What happens if my Mesh connection is lost?">
     If the connection between Vexel Horizon and Vexel Core is interrupted, the terminal falls back to **Fail-Safe Sandbox Mode**. In this state:
 
-    - The terminal continues to display **cached data** so you can still view your last-known portfolio state and market figures.
-    - All **write operations are blocked** — trading, governance, and strategy deployment are unavailable until the connection is restored.
-    - Protected sections (Trading, Governance, Neural Strategist, Risk Insurance) display the **Sovereign Link screen** instead of their normal content.
-    - The activity feed logs: `"Connection lost. Operating in Fail-Safe Sandbox Mode."`
+    - The terminal continues to display **cached data** so you can still view your last-known portfolio state.
+    - **Write actions are blocked** — AI Proposal approvals, simulation syncs, and votes are unavailable until the connection is restored.
+    - Protected sections (Intelligence Lab, Community Board) display the **Sovereign Link screen** instead of their normal content.
+    - The activity feed logs: `Connection lost. Operating in Fail-Safe Sandbox Mode.`
 
-    Once connectivity is restored, re-authenticating via Sovereign Link will resume full terminal functionality.
+    Once connectivity is restored, the `marketPulse` stream resumes and full terminal functionality returns.
   </Accordion>
 
 </AccordionGroup>

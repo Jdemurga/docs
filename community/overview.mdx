@@ -1,0 +1,77 @@
+---
+title: "Community Board: Ecosystem Voting and Sentiment"
+description: "The Community Board is Vexel Horizon's governance surface. Review active proposals, read AI-powered sentiment analysis, and authorize votes from Vexel Mobile."
+---
+
+The Community Board is where the Vexel ecosystem decides what happens next. Every authenticated Sovereign node can review active proposals, inspect the Neural Consensus insight, and signal Support or Against directly from the terminal. The final vote is signed from Vexel Mobile so your biometric identity authorizes the outcome — not just your browser session.
+
+## Opening the Community Board
+
+Click **Community Board** (🗳️) in the left sidebar. The panel loads all active proposals from the network.
+
+<Note>
+  The Community Board is a protected section. If you are not authenticated, the terminal redirects you to the Sovereign Link screen. Complete [Sovereign Link](/sovereign-link) authentication to vote.
+</Note>
+
+## What you see on a proposal card
+
+Every proposal surfaces as a card in a responsive grid. A card contains:
+
+<CardGroup cols={2}>
+  <Card title="Category badge" icon="tag">
+    A short label that identifies the proposal's domain — for example, `ECOSYSTEM` for listing additions, or `IA BEHAVIOR` for adjustments to the AI engine.
+  </Card>
+  <Card title="Title and description" icon="file-lines">
+    A one-line title plus a plain-language summary of the proposed change and its scope.
+  </Card>
+  <Card title="Neural Consensus" icon="brain">
+    An AI-generated analysis of the projected impact on yield, liquidity, and network stability.
+  </Card>
+  <Card title="Vote buttons" icon="square-check">
+    **Support** and **Against** actions that open the Sovereign Guardian modal for biometric authorization.
+  </Card>
+</CardGroup>
+
+## Example proposal categories
+
+The Community Board handles a wide range of ecosystem decisions. Recent examples include:
+
+- **ECOSYSTEM** — *Include Tokenized Real Estate in the RWA Hub.* A proposal to add the "Manhattan Tech Center" RWA asset to the simulation lab and Market Hub for all Sovereign users.
+- **IA BEHAVIOR** — *Increase Neutral Rebalance Sensitivity.* A proposal to adjust the AI engine to suggest rebalances when portfolio deviation exceeds 3% (currently 5%).
+
+## How to vote
+
+<Steps>
+  <Step title="Open the Community Board">
+    Click **Community Board** in the sidebar. The terminal fetches all active proposals from `GET /api/market/public/proposals`.
+  </Step>
+  <Step title="Review the proposal">
+    Read the title, description, and Neural Consensus block on the card. Check the `meshSentiment` badge for the current community leaning, if available.
+  </Step>
+  <Step title="Click Support or Against">
+    Pick your position. The Sovereign Guardian modal appears with a QR code scoped to this specific vote — for example, `Voting FOR: Include Tokenized Real Estate in RWA Hub`.
+  </Step>
+  <Step title="Sign from Vexel Mobile">
+    Open Vexel Mobile and scan the QR. Authorize with your biometric signature. Once signed, your vote propagates to The Mesh on the next pulse.
+  </Step>
+</Steps>
+
+## Neural Consensus
+
+Before casting a vote, each proposal card surfaces a **Neural Consensus** insight — the AI's read of the theoretical impact the change would have on the ecosystem. This is informational only.
+
+<Info>
+  Neural Consensus does not weight or override your vote. You retain full decision-making authority. Think of it as a second opinion, not an instruction.
+</Info>
+
+## Governance propagation through The Mesh
+
+Every 15 seconds, The Mesh emits a pulse that synchronizes governance state globally. When you sign a vote, the signed action is recorded on the next Mesh pulse and propagated across all connected Sovereign nodes. Votes cannot be silently rewritten — the lattice signature binds each vote to your session and can be independently verified.
+
+<Warning>
+  The QR code generated for a vote is single-use and scoped to the exact proposal and direction. Never share a screenshot of an active voting QR.
+</Warning>
+
+## Why votes require a mobile signature
+
+The browser session is a display surface, not an authorization surface. A compromised browser cannot cast a vote on your behalf because every vote requires a fresh lattice-signed proof from the biometric credentials stored on your Vexel Mobile device. See [Lattice Security](/concepts/lattice-security) for the full cryptographic flow.

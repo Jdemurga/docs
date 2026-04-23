@@ -17,23 +17,27 @@ Vexel's **Sovereign Guardian** protocol was designed from the outset around latt
 
 ## Where Lattice Security applies
 
-### Trade execution
+### AI Proposal approvals
 
-Every swap you execute through the Sovereign Guardian flow is lattice-signed before The Mesh processes it. The Mesh verifies the lattice proof before the trade executes — unsigned or improperly signed transactions are rejected at the network level.
+Every AI Proposal you approve from the Dashboard — rebalance, buy/sell signal, emerging-opportunity acceptance — is routed through the Sovereign Guardian flow and lattice-signed on Vexel Mobile before The Mesh executes it. The Mesh verifies the lattice proof before the action takes effect; unsigned or improperly signed payloads are rejected at the network level.
 
-### Completed transaction feedback
+### Completed action feedback
 
-When a trade completes with lattice verification, the execution feedback panel in the Trading section updates to show:
+When an action completes with lattice verification, the execution feedback panel in the terminal updates to show:
 
 - A **blue highlighted** feedback panel border
-- The text **"Quantum Secured!"** followed by the AI's reasoning for the transaction
+- The text **"Quantum Secured!"** followed by the AI's reasoning for the action
 - A **`LATTICE_VERIFIED`** badge confirming the cryptographic proof was accepted by The Mesh
 
-The panel clears automatically after 5 seconds, and a permanent record is written to your Sovereign Reasoning feed under the `LEDGER` prefix, including the audit ID.
+The panel clears automatically after 5 seconds, and a permanent record is written to your activity feed under the `LEDGER` prefix, including the audit ID.
 
-### Governance votes
+### Community Board votes
 
-Votes authorized from Vexel Mobile go through the same Sovereign Guardian lattice-signing flow as trade executions. The Mesh verifies the signature before recording the vote as valid.
+Votes authorized from Vexel Mobile go through the same Sovereign Guardian lattice-signing flow. The Mesh verifies the signature before recording the vote as valid. See [Community Board](/community/overview) for the voting flow.
+
+### Intelligence Lab strategy syncs
+
+When you click **Sync Strategy to Mobile** in the Intelligence Lab, the suggested rebalance is packaged into a Sovereign Guardian request and signed on Vexel Mobile before The Mesh picks it up for execution.
 
 ## The Sovereign Guardian authorization flow
 
