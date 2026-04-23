@@ -1,0 +1,63 @@
+---
+title: "API reference"
+description: "REST endpoints and Socket.io events consumed by Vexel Mobile, mapped to the services that call them."
+---
+
+Vexel Mobile talks to the `Vexel-Core` backend over REST and Socket.io. Every URL is derived from `lib/core/config/app_config.dart`, which centralizes the base domain.
+
+## Base configuration
+
+```dart
+class AppConfig {
+  static const String domain = 'vexel.es';
+  static const String baseUrl = 'https://$domain';
+  static const String apiBaseUrl = '$baseUrl/api';
+  static const String authUrl = '$apiBaseUrl/auth';
+  static const String marketUrl = '$apiBaseUrl/market';
+  static const String wsUrl = baseUrl; // WebSocket Gateway
+}
+```
+
+Override the `domain` value (or swap out `AppConfig` via a build flavor) to target a local or staging backend.
+
+## REST endpoints
+
+| Service | Endpoint | Method | Description | Dart call |
+| :--- | :--- | :--- | :--- | :--- |
+| `AuthService` | `/auth/signup` | `POST` | Register a new user | `AuthService().signUp(email, pass, name)` |
+| `AuthService` | `/auth/login` | `POST` | Sign in and receive a JWT | `AuthService().login(email, pass)` |
+| `AuthService` | `/auth/link` | `POST` | Link the mobile session with a web session (Sovereign Link) | `AuthService().linkSession(sessionId)` |
+| `AuthService` | `/auth/authorize` | `POST` | Authorize a pending action with biometric + PQC signatures | `AuthService().authorizeAction(txnId, signature)` |
+| `UserService` | `/auth/preferences` | `POST` | Update user preferences such as `preferredLanguage` | `UserService().updatePreferences(preferredLanguage)` |
+| `MarketService` | `/market/search?q={query}` | `GET` | Search assets by symbol or name | `MarketService().searchAssets('BTC')` |
+| `MarketService` | `/market/watchlist` | `GET` | Fetch the user's watchlist | `MarketService().getWatchlist()` |
+| `MarketService` | `/market/watchlist` | `POST` | Add an asset to the watchlist | `MarketService().addToWatchlist(asset)` |
+| `MarketService` | `/market/watchlist?symbol={s}` | `DELETE` | Remove an asset from the watchlist | `MarketService().removeFromWatchlist('BTC')` |
+| `MarketService` | `/market/trending` | `GET` | Fetch trending assets | `MarketService().getTrending()` |
+| `MarketService` | `/market/simulate` | `GET` | Run a market simulation for an asset | `MarketService().getSimulation(symbol, trendPct, sentiment, volume)` |
+| `MarketService` | `/market/simulate/interpret` | `POST` | Interpret natural-language simulation scenarios | `MarketService().interpretScenario('buy if sentiment is high')` |
+| `MarketService` | `/market/trading/history` | `GET` | Fetch the AI reasoning log history | `MarketService().getReasoningLogs()` |
+| `MarketService` | `/market/history?symbol={s}&type={t}` | `GET` | Fetch historical price data for an asset | `MarketService().getHistory('AAPL', 'stock')` |
+| `MarketService` | `/market/portfolios` | `POST` | Create or update a portfolio | `MarketService().savePortfolio(name, assets)` |
+| `MarketService` | `/market/portfolios` | `GET` | Fetch the user's portfolios | `MarketService().getPortfolios()` |
+
+## Socket.io events
+
+`MarketService` opens a single WebSocket connection to `AppConfig.wsUrl` and fans events out to Riverpod providers.
+
+### Events received
+
+| Event | Description | Handled in |
+| :--- | :--- | :--- |
+| `priceUpdate` | Real-time price tick for a subscribed asset | `MarketService.priceStream` → `PriceRegistry` → `livePriceProvider` |
+| `pending_action` | A write action requires biometric approval | `_DashboardScreenState` (shows `ActionApprovalDialog`) |
+
+### Events emitted
+
+| Event | Description | Emitted by |
+| :--- | :--- | :--- |
+| `session_revoked` | Revoke a specific web session paired through Sovereign Link | `_ProfileScreenState` |
+
+<Note>
+  All REST calls carry the JWT stored in `flutter_secure_storage`. Treat the Socket.io connection the same way: it is only established after `authStateProvider` transitions to authenticated, and it is torn down on logout.
+</Note>
