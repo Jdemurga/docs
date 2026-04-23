@@ -1,16 +1,22 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Vexel Horizon API",
+    "description": "HTTP endpoints exposed by Vexel Core and consumed by the Vexel Horizon terminal. The API powers dashboard data, the Market Hub, Community Board proposals, trade execution, and Intelligence Lab strategy deployment. Real-time updates are delivered over a separate Socket.io channel (see the WebSocket events reference).",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Vexel Horizon",
+      "url": "https://github.com/Jdemurga/vexel-horizon"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://horizon.vexel.ai/api",
+      "description": "Production Vexel Core API (proxied under /api)"
+    },
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local development proxy (Nginx -> Vexel Core)"
     }
   ],
   "security": [
@@ -18,77 +24,183 @@
       "bearerAuth": []
     }
   ],
+  "tags": [
+    {
+      "name": "Dashboard",
+      "description": "Personal and public ecosystem metrics used by the Vexel Horizon dashboard."
+    },
+    {
+      "name": "Market",
+      "description": "Price history, trending assets, and market execution endpoints."
+    },
+    {
+      "name": "Community",
+      "description": "Governance proposals surfaced in the Community Board."
+    },
+    {
+      "name": "Intelligence",
+      "description": "Strategy deployment used by the Intelligence Lab / Neural Strategist."
+    }
+  ],
   "paths": {
-    "/plants": {
+    "/market/dashboard": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "tags": ["Dashboard"],
+        "summary": "Personal dashboard",
+        "description": "Returns the authenticated Sovereign user's personal vault snapshot — total value, AI confidence, and asset allocation. Used by `initDashboard()` to populate the stat cards and the Neural Allocation doughnut chart.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Personal vault snapshot.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PersonalDashboard" }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Sovereign token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/public/ecosystem": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Public ecosystem dashboard",
+        "description": "Returns aggregate Mesh metrics displayed in Guest Mode — total ecosystem value, number of connected Sovereign nodes, confidence, and allocation mix.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Global ecosystem snapshot.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EcosystemDashboard" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/yield/personal": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Personal yield velocity",
+        "description": "Returns the authenticated user's per-second capital growth, used to drive the Yield Velocity counter in Sovereign Mode.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Personal velocity payload.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/YieldStatus" }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Sovereign token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/public/yield/status": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Public yield velocity",
+        "description": "Returns the ecosystem-wide collective velocity in Guest Mode.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Collective velocity payload.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/YieldStatus" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/history": {
+      "get": {
+        "tags": ["Market"],
+        "summary": "Asset price history",
+        "description": "Returns the historical price series for a specific asset. Drives the Market Intelligence line chart on the Dashboard.",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "name": "limit",
+            "name": "symbol",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "required": true,
+            "description": "Asset ticker symbol (for example, `BTC`, `ETH`, `AAPL`).",
+            "schema": { "type": "string", "example": "BTC" }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "description": "Asset class the symbol belongs to.",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "enum": ["crypto", "equity", "commodity", "rwa"],
+              "example": "crypto"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Historical price series.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/PriceHistory" }
               }
             }
           }
         }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
+      }
+    },
+    "/market/public/index-history": {
+      "get": {
+        "tags": ["Market"],
+        "summary": "Ecosystem index history",
+        "description": "Returns the historical values of the Vexel Ecosystem Index, shown on the Market Intelligence chart when browsing in Guest Mode.",
+        "security": [],
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Index history series.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
+                "schema": { "$ref": "#/components/schemas/IndexHistory" }
               }
             }
-          },
-          "400": {
-            "description": "unexpected error",
+          }
+        }
+      }
+    },
+    "/market/trending": {
+      "get": {
+        "tags": ["Market"],
+        "summary": "Trending assets",
+        "description": "Returns assets and macro items flagged as trending by the neural feed. Powers the Market Hub grid and the dashboard market ticker.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "List of trending assets.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TrendingAsset" }
                 }
               }
             }
@@ -96,121 +208,388 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/market/execute": {
+      "post": {
+        "tags": ["Market"],
+        "summary": "Execute Sovereign swap",
+        "description": "Submits a swap or trade intent. The call runs the AI Guardrails scanner; it returns either `PendingAuthorization` (requires biometric signing from Vexel Mobile) or `Aborted` with a list of risk details.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SwapRequest" }
             }
           }
-        ],
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Swap intent accepted or aborted.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SwapResponse" }
+              }
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Missing or invalid Sovereign token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/public/proposals": {
+      "get": {
+        "tags": ["Community"],
+        "summary": "Active governance proposals",
+        "description": "Returns the list of active proposals rendered on the Community Board. Includes the Neural Consensus insight for each proposal.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Active proposals.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Proposal" }
                 }
               }
             }
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/market/strategy/canvas": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "tags": ["Intelligence"],
+        "summary": "Deploy strategy canvas",
+        "description": "Deploys a visual strategy graph built in the Intelligence Lab / Neural Strategist. The server validates, simulates, and returns a Neural Simulation Report. Execution of the underlying actions still requires biometric approval from Vexel Mobile.",
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
+              "schema": { "$ref": "#/components/schemas/StrategyDeployRequest" }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Strategy accepted, simulation returned.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StrategyDeployResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Sovereign token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Sovereign JWT issued to the browser after a successful Sovereign Link handshake. Stored in `localStorage` under `vexel_jwt`."
+      }
+    },
+    "schemas": {
+      "Allocation": {
+        "type": "object",
+        "description": "Asset-weight map. Keys are asset tickers; values are portfolio weights in percent.",
+        "additionalProperties": {
+          "type": "number",
+          "format": "float",
+          "example": 35.0
+        },
+        "example": {
+          "BTC": 35,
+          "ETH": 25,
+          "AAPL": 15,
+          "CASH": 25
+        }
+      },
+      "PersonalDashboard": {
+        "type": "object",
+        "required": ["totalValue", "confidence", "allocation"],
+        "properties": {
+          "totalValue": {
+            "type": "number",
+            "description": "Total Sovereign vault value in USD.",
+            "example": 1245680.0
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Neural confidence score (0-100) across the active portfolio.",
+            "example": 92.5
+          },
+          "allocation": { "$ref": "#/components/schemas/Allocation" }
+        }
+      },
+      "EcosystemDashboard": {
+        "type": "object",
+        "required": ["ecosystemNetWorth", "totalUsers", "confidence", "allocation"],
+        "properties": {
+          "ecosystemNetWorth": {
+            "type": "number",
+            "description": "Total value across all Sovereign nodes on The Mesh, in USD.",
+            "example": 482300000.0
+          },
+          "totalUsers": {
+            "type": "integer",
+            "description": "Number of Sovereign nodes currently connected to The Mesh.",
+            "example": 12480
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Aggregate neural confidence score across the ecosystem (0-100).",
+            "example": 87.3
+          },
+          "allocation": { "$ref": "#/components/schemas/Allocation" }
+        }
+      },
+      "YieldStatus": {
+        "type": "object",
+        "required": ["velocity_per_second"],
+        "properties": {
+          "velocity_per_second": {
+            "type": "number",
+            "description": "Capital growth in USD per second.",
+            "example": 0.024
+          }
+        }
+      },
+      "PriceHistoryPoint": {
+        "type": "object",
+        "required": ["timestamp", "price"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-04-22T18:00:00Z"
+          },
+          "price": {
+            "type": "number",
+            "example": 64231.42
+          }
+        }
+      },
+      "PriceHistory": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PriceHistoryPoint" }
+          }
+        }
+      },
+      "IndexHistory": {
+        "type": "array",
+        "description": "Vexel Ecosystem Index points, oldest first.",
+        "items": { "$ref": "#/components/schemas/PriceHistoryPoint" }
+      },
+      "TrendingAsset": {
+        "type": "object",
+        "required": ["symbol", "price", "change", "confidence"],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "type": {
+            "type": "string",
+            "description": "Asset class or trend category.",
+            "enum": ["crypto", "equity", "commodity", "rwa", "macro"],
+            "example": "crypto"
+          },
+          "price": {
+            "type": "number",
+            "example": 64231.42
+          },
+          "change": {
+            "type": "number",
+            "description": "24-hour price change, expressed as a percentage.",
+            "example": 2.4
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Neural confidence score for the trend signal (0-100).",
+            "example": 94
+          }
+        }
+      },
+      "SwapRequest": {
+        "type": "object",
+        "required": ["fromAsset", "toAsset", "amount", "destination"],
+        "properties": {
+          "fromAsset": {
+            "type": "string",
+            "description": "Source asset ticker.",
+            "example": "BTC"
+          },
+          "toAsset": {
+            "type": "string",
+            "description": "Destination asset ticker.",
+            "example": "ETH"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount of `fromAsset` to swap, in native units.",
+            "example": 0.5
+          },
+          "destination": {
+            "type": "string",
+            "description": "Destination vault or account identifier.",
+            "example": "vault_primary"
+          }
+        }
+      },
+      "SwapScanResult": {
+        "type": "object",
+        "description": "AI Guardrails scanner result used to decide whether to authorize the swap.",
+        "properties": {
+          "riskScore": {
+            "type": "number",
+            "example": 12
+          },
+          "reasoning": {
+            "type": "string",
+            "example": "Spread within tolerance; origin wallet clean."
+          }
+        }
+      },
+      "SwapResponse": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["PendingAuthorization", "Aborted"],
+            "description": "`PendingAuthorization` requires biometric signing from Vexel Mobile. `Aborted` indicates the scanner blocked the order.",
+            "example": "PendingAuthorization"
+          },
+          "scanResult": { "$ref": "#/components/schemas/SwapScanResult" },
+          "details": {
+            "type": "array",
+            "description": "Risk reasons returned when the swap is aborted.",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "Proposal": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Include Tokenized Real Estate in RWA Hub"
+          },
+          "description": {
+            "type": "string",
+            "example": "Proposal to add the 'Manhattan Tech Center' RWA asset to the simulation lab and Market Hub for all Sovereign users."
+          },
+          "meshSentiment": {
+            "type": "string",
+            "description": "Community sentiment leaning detected on The Mesh.",
+            "enum": ["support", "against", "neutral"],
+            "example": "support"
+          },
+          "neuralSummary": {
+            "type": "string",
+            "description": "Neural Consensus summary of projected impact.",
+            "example": "Adds 4.2% yield diversification with limited correlation to crypto drawdowns."
+          }
+        }
+      },
+      "StrategyDeployRequest": {
+        "type": "object",
+        "required": ["name", "graph"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "DCA_GOLD"
+          },
+          "graph": {
+            "type": "string",
+            "description": "Serialized JSON representation of the Neural Strategist node graph (nodes and connections).",
+            "example": "{\"nodes\":[{\"id\":\"n1\",\"type\":\"trigger\"}],\"connections\":[]}"
+          }
+        }
+      },
+      "StrategyAction": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "example": "BUY"
+          },
+          "details": {
+            "type": "string",
+            "example": "Acquire 0.5 PAXG at market on next Mesh pulse."
+          }
+        }
+      },
+      "StrategySimulation": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "nominal"
+          },
+          "paths_triggered": {
+            "type": "integer",
+            "example": 3
+          },
+          "actions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/StrategyAction" }
+          }
+        }
+      },
+      "StrategyDeployResponse": {
+        "type": "object",
+        "required": ["status", "strategyId"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "deployed"
+          },
+          "strategyId": {
+            "type": "string",
+            "example": "strat_8a2f"
+          },
+          "simulation": { "$ref": "#/components/schemas/StrategySimulation" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": {
+            "type": "integer",
+            "format": "int32",
+            "example": 401
+          },
+          "message": {
+            "type": "string",
+            "example": "Sovereign session required."
+          }
+        }
       }
     }
   }
