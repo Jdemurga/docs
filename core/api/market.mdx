@@ -144,5 +144,5 @@ Error responses use NestJS defaults:
 Vexel Core composes data from Finnhub, CoinGecko, Alpha Vantage, and Twelve Data. Provider failures are tolerated through fallback logic — a missing fundamentals provider, for example, does not break a dashboard response.
 
 <Info>
-  History endpoints read from and write to TimescaleDB. The first call for a new asset may trigger a background sync handled by `HistorySyncService`.
+  History endpoints read from and write to TimescaleDB. `HistorySyncService` runs a daily sync at midnight that persists watchlist and benchmark history and refreshes continuous aggregate views for fast range queries. You can also trigger a sync on demand with `POST /market/sync-history`.
 </Info>

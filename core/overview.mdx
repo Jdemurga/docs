@@ -58,18 +58,18 @@ graph TD
 
 ## Module map
 
-The codebase is organized into domain-aligned modules.
+The codebase is organized into domain-aligned modules under `src/`.
 
-| Module | Responsibility |
-|---|---|
-| `Auth` | User registration, login, Sovereign Link session binding, preferences |
-| `Market` | Market data, portfolios, watchlists, trading, reports, RWA, insurance, taxes, yield |
-| `Governance` | DAO proposals and voting |
-| `Events` | Socket.io gateways for real-time signaling and high-frequency terminal data |
-| `Sentiment` | Bridge to Vexel Brain for sentiment analysis |
-| `Common` | Security, HSM, vault, ledger, trust, and Redis mesh services |
-| `Database` | TypeORM connection and shared entities |
-| `Config` | Environment-driven configuration |
+| Module | Responsibility | Source path |
+|---|---|---|
+| `Auth` | User registration, login, Sovereign Link session binding, preferences | `src/auth/` |
+| `Market` | Market data, portfolios, watchlists, trading, reports, RWA, insurance, taxes, yield | `src/market/` |
+| `Governance` | DAO proposals and voting | `src/governance/` |
+| `Events` | Socket.io gateways for real-time signaling and high-frequency terminal data | `src/events/` |
+| `Sentiment` | Bridge to Vexel Brain for sentiment analysis | `src/sentiment/` |
+| `Common` | Security, HSM, vault, ledger, trust, and Redis mesh services | `src/common/` |
+| `Database` | TypeORM connection and shared entities | `src/database/` |
+| `Config` | Environment-driven configuration | `src/config/` |
 
 ## Where to go next
 

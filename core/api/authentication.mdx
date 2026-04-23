@@ -15,43 +15,34 @@ All endpoints are rooted at `/auth`.
 
 `POST /auth/signup`
 
-Creates a user record and returns a session JWT.
+Creates a user record. Passwords are hashed with bcrypt before persistence.
 
 **Body**
 
 ```json
 {
   "email": "user@example.com",
-  "password": "strong-password",
-  "displayName": "Satoshi"
+  "pass": "strong-password",
+  "name": "Satoshi"
 }
 ```
 
 **Response**
 
-```json
-{
-  "access_token": "<jwt>",
-  "user": {
-    "id": "<uuid>",
-    "email": "user@example.com",
-    "displayName": "Satoshi"
-  }
-}
-```
+Returns `201 Created` with an empty body on success. Call `POST /auth/login` to obtain a JWT.
 
 ### Log in
 
 `POST /auth/login`
 
-Validates credentials and returns a fresh JWT.
+Validates credentials and returns a fresh JWT alongside the user summary.
 
 **Body**
 
 ```json
 {
   "email": "user@example.com",
-  "password": "strong-password"
+  "pass": "strong-password"
 }
 ```
 
@@ -59,8 +50,13 @@ Validates credentials and returns a fresh JWT.
 
 ```json
 {
-  "access_token": "<jwt>",
-  "user": { "id": "<uuid>", "email": "user@example.com" }
+  "accessToken": "<jwt>",
+  "user": {
+    "id": "<uuid>",
+    "email": "user@example.com",
+    "name": "Satoshi",
+    "preferredLanguage": "en"
+  }
 }
 ```
 
@@ -102,23 +98,18 @@ Updates mutable user preferences such as language.
 
 **Response**
 
-```json
-{
-  "status": "ok",
-  "user": { "id": "<uuid>", "preferredLanguage": "es" }
-}
-```
+Returns `200 OK` with an empty body on success.
 
 ## JWT strategy
 
 Vexel Core uses `passport-jwt` with the `JWT_SECRET` environment variable. Include the token on every protected request:
 
 ```http
-Authorization: Bearer <access_token>
+Authorization: Bearer <accessToken>
 ```
 
 <Info>
-  JWTs carry `userId` and `email` claims. Controllers that extend `@UseGuards(AuthGuard('jwt'))` receive the decoded payload on `req.user`.
+  Tokens carry the user ID (as `sub`) and `email` claims. Controllers guarded with `@UseGuards(AuthGuard('jwt'))` receive the decoded payload on `req.user` (mapped to `{ userId, email }` by `JwtStrategy`).
 </Info>
 
 ## Error responses
